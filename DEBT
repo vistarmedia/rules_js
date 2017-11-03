@@ -1,0 +1,10 @@
+* The on-disk library format used to be a tgz laid out in a particular way. This
+  was called a `js_tar`, and there are still dangling references to this format.
+  Namely the npm_to_jsar.py helper
+* Internal rules and attributes should be underscored. This will break other
+  rules that depend on the inner workings of these rules -- which is great.
+* Now that this is all strung together, it would be a good use of time to try to
+  fiddle with the binary format. For example, there may be a way to reduce I/O
+  by writing (hard|sym) links to existing files -- the format need not be
+  portable across machines.
+* The `js_bundle` rules have no tests
