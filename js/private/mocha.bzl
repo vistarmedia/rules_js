@@ -21,12 +21,8 @@ def _js_test_impl(ctx):
 
   if ctx.attr.reporter:
     reporter = ctx.attr.reporter
-    reporter_root = reporter.label.workspace_root.replace('/', '', 1)
-    reporter_path = reporter.label.package + '/' + reporter.label.name
-    if reporter_root:
-      reporter_path = reporter_root + '/' + reporter_path
     deps += [reporter]
-    arguments += ['--reporter=' + reporter_path]
+    arguments += ['--reporter=' + reporter.label.package]
 
   arguments += ['node_modules/%s' % src.short_path for src in ctx.files.srcs]
 
