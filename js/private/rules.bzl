@@ -182,7 +182,7 @@ def _js_binary_impl(ctx):
 
 jsar_attr = attr.label(
   default    = Label('@io_bazel_rules_js//js/tools:jsar-bin'),
-  cfg        = 'data',
+  cfg        = 'host',
   executable = True)
 
 node_attr = attr.label(
