@@ -7,8 +7,7 @@
 // with the defaults of their parent directories.
 //
 // While something like protobuf may be better to represent the header, json is
-// used here  to minimize dependencies. The layout of single entry is as
-// follows:
+// used here to minimize dependencies. The layout of single entry is as follows:
 //
 //    +-----------------------+--------+----------+
 //    | uvarint header length | header | bytes... |

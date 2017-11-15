@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -87,6 +88,33 @@ func unbundleTo(jsarpath, dstpath string) error {
 	return r.Close()
 }
 
+func list(jsarPath string) error {
+	file, err := os.Open(jsarPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	r, err := jsar.NewReader(file)
+	if err != nil {
+		return err
+	}
+
+	for {
+		info, err := r.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+		fmt.Printf("%d\t%s\n", info.Size, info.Name)
+		if _, err := io.Copy(ioutil.Discard, r); err != nil {
+			return err
+		}
+	}
+
+	return r.Close()
+}
+
 func unbundle(cmd string, args []string) error {
 	var (
 		flagSet = flag.NewFlagSet(cmd, flag.ExitOnError)
@@ -105,6 +133,28 @@ func unbundle(cmd string, args []string) error {
 		}
 	}
 
+	return nil
+}
+
+func ls(cmd string, args []string) error {
+	flagSet := flag.NewFlagSet(cmd, flag.ExitOnError)
+	if err := flagSet.Parse(args); err != nil {
+		return err
+	}
+	switch flagSet.NArg() {
+	case 0:
+		return errors.New("ls <jsar>")
+	case 1:
+		return list(flagSet.Args()[0])
+	default:
+		for _, jsar := range flagSet.Args() {
+			fmt.Printf("%s:\n", jsar)
+			if err := list(jsar); err != nil {
+				return err
+			}
+			fmt.Println()
+		}
+	}
 	return nil
 }
 
@@ -168,7 +218,8 @@ func fromtarball(cmd string, args []string) error {
 }
 
 func usage(args []string) {
-	fmt.Fprintf(os.Stderr, "USAGE: %s (bundle|unbundle|fromtarball)\n", args[0])
+	fmt.Fprintf(
+		os.Stderr, "USAGE: %s (bundle|unbundle|ls|fromtarball)\n", args[0])
 	os.Exit(2)
 }
 
@@ -190,6 +241,9 @@ func main() {
 
 	case "unbundle":
 		err = unbundle(args[0], args[2:])
+
+	case "ls":
+		err = ls(args[0], args[2:])
 
 	case "fromtarball":
 		err = fromtarball(args[0], args[2:])

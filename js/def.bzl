@@ -8,5 +8,5 @@ load('//js/private:npm.bzl',
 
 load('//js/private:rules.bzl',
   'js_library',
-  'js_binary')
-
+  'js_binary',
+  'jsar')

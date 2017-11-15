@@ -197,7 +197,7 @@ js_dep_attr = attr.label_list(providers=js_dep_providers)
 jsar = rule(
   _jsar_impl,
   attrs = {
-    'tar':   attr.label(
+    'tar': attr.label(
       allow_files = FileType(['.tgz', '.tar.gz']),
       single_file = True,
       mandatory   = True),

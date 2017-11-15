@@ -1,4 +1,3 @@
-
 def _external_name(name):
   """
   Bazel does not allow dashes in external names. Follow the convention of
@@ -65,6 +64,12 @@ def _create_workspace(ctx, tarballs):
   cmd += ['--npm_tar'] + npm_tars
   if ignore_deps:
     cmd += ['--ignore_deps'] + ignore_deps
+
+  if ctx.attr.ignore_paths:
+    cmd += ['--ignore_paths'] + ctx.attr.ignore_paths
+
+  if ctx.attr.rename:
+    cmd += ['--rename', ctx.attr.package + ':' + ctx.attr.name]
 
   ctx.execute(cmd)
 
@@ -137,11 +142,13 @@ def _npm_tarball_install_impl(ctx):
 
 
 attrs = {
-  'package':      attr.string(),
-  'sha256':       attr.string(),
-  'type_version': attr.string(),
-  'type_sha256':  attr.string(),
-  'ignore_deps':  attr.string_list(),
+  'package':       attr.string(),
+  'sha256':        attr.string(),
+  'type_version':  attr.string(),
+  'type_sha256':   attr.string(),
+  'ignore_deps':   attr.string_list(),
+  'ignore_paths':  attr.string_list(),
+  'rename':        attr.bool(default=False),
 
   '_npm_to_jsar': attr.label(
     default    = Label('//js/tools:npm_to_jsar.py'),
@@ -160,15 +167,19 @@ _npm_tarball_install = repository_rule(
   attrs = attrs + {'url': attr.string(mandatory=True)},
 )
 
-
 def npm_install(name, **kwargs):
   """
   Sanitizes the given name and creates a sanitized external target using the
   `_npm_install` rule.
   """
   external = _external_name(name)
-  return _npm_install(name=external, package=name, **kwargs)
-
+  rename = False
+  from_pkg = kwargs.pop('from_package', None)
+  pkg_name = name
+  if from_pkg:
+    pkg_name = from_pkg
+    rename = True
+  return _npm_install(name=external, package=pkg_name, rename=rename, **kwargs)
 
 def npm_tarball_install(name, **kwargs):
   external = _external_name(name)

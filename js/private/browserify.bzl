@@ -4,7 +4,6 @@ load('@io_bazel_rules_js//js/private:rules.bzl',
 
 
 def _browserify_impl(ctx):
-
   entry = ctx.attr.entrypoint.main.short_path.replace('.js', '')
 
   arguments = [
@@ -34,7 +33,6 @@ def _browserify_impl(ctx):
 
 
 def _uglify_impl(ctx):
-
   arguments = [
     '-o', ctx.outputs.js.path,
     ctx.file.src.path,

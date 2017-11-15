@@ -9,8 +9,10 @@ import tarfile
 parser = argparse.ArgumentParser('Convert NPM tarballs into js_tar impls')
 parser.add_argument('--buildfile')
 parser.add_argument('--output')
+parser.add_argument('--rename')
 parser.add_argument('--npm_tar', nargs='+')
 parser.add_argument('--ignore_deps', nargs='*')
+parser.add_argument('--ignore_paths', nargs='*', default=[])
 
 
 _BUILDFILE = string.Template("""
@@ -24,12 +26,21 @@ jsar(
 )
 """)
 
+def _contains_ignored_path(path, ignore_paths):
+  for ignored_path in ignore_paths:
+    if path.startswith(ignored_path):
+      return True
+  return False
 
-def _package_roots(src):
+
+def _package_roots(src, ignore_paths):
   """
   Extract the package roots from an npm tarball. A spec for exactly how this
   works would be clearly too much to ask, so we're saying any directory that
   contains a package.json is a root.
+
+  Any paths contained in 'ignore_paths' will be skipped. Useful if there is a
+  file called package.json that isnt meant to be a npm package.
 
   Return the root, and the deserialized package.json
   """
@@ -39,6 +50,9 @@ def _package_roots(src):
 
     # Do not look in nested node_modules directories for dependencies
     if '/node_modules/' in name:
+      continue
+
+    if _contains_ignored_path(name, ignore_paths):
       continue
 
     if os.path.basename(name) == 'package.json':
@@ -71,9 +85,10 @@ def _copy_package(src, dst, root, package):
   return deps
 
 
-def _copy_tar_files(src, dst):
+def _copy_tar_files(src, dst, ignore_paths, rename):
   deps = {}
-  for root, package in _package_roots(src):
+  for root, package in _package_roots(src, ignore_paths):
+    package['name'] = rename.get(package['name'], package['name'])
     deps.update(_copy_package(src, dst, root, package))
   return deps
 
@@ -108,13 +123,15 @@ def _write_buildfile(filename, deps, js_tar_name, ignore_deps,
     }))
 
 
-def _main(buildfile, js_tar_name, npm_tar_names, ignore_deps):
+def _main(
+  buildfile, js_tar_name, npm_tar_names, ignore_deps, ignore_paths, rename):
+
   js_tar = tarfile.open(js_tar_name, 'w:gz')
   deps   = {}
 
   for npm_tar_name in npm_tar_names:
     with tarfile.open(npm_tar_name) as npm_tar:
-      deps.update(_copy_tar_files(npm_tar, js_tar))
+      deps.update(_copy_tar_files(npm_tar, js_tar, ignore_paths, rename))
 
   _write_buildfile(buildfile, deps, js_tar_name, ignore_deps)
 
@@ -136,11 +153,18 @@ def main(args):
     parser.print_help()
     return 2
 
+  rename = {}
+  if params.rename:
+    parts = params.rename.split(':')
+    rename = {parts[0]: parts[1]}
+
   _main(
     buildfile      = params.buildfile,
     js_tar_name    = params.output,
     npm_tar_names  = params.npm_tar,
     ignore_deps    = params.ignore_deps,
+    ignore_paths   = params.ignore_paths,
+    rename         = rename,
   )
 
   return 0
