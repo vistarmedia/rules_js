@@ -33,19 +33,22 @@ def _jsar_impl(ctx):
     deps  = transitive_jsars(ctx.attr.deps),
   )
 
-def _jsar_path(src):
+def _jsar_path(src, package):
+  if package:
+    return package +'/'+ src.basename
+
   path = src.short_path
   if path.startswith('../'):
     return path[3:]
   return path
 
 
-def _build_src_jsar(ctx, srcs, output):
+def _build_src_jsar(ctx, srcs, package, output):
   arguments = [
     'bundle',
     '-output', output.path,
   ] + [
-    '%s=/%s' % (s.path, _jsar_path(s)) for s in srcs
+    '%s=/%s' % (s.path, _jsar_path(s, package)) for s in srcs
   ]
 
   ctx.action(
@@ -75,16 +78,20 @@ def _build_dep_jsar(ctx, deps, output):
   return output
 
 
-def build_jsar(ctx, files, jsars, output):
+def build_jsar(ctx, files, package, jsars, output):
   src_jsar = _build_src_jsar(
-    ctx, files, ctx.new_file(ctx.label.name +'.srcJsar'))
+    ctx     = ctx,
+    srcs    = files,
+    package = package,
+    output  = ctx.new_file(ctx.label.name +'.srcJsar'),
+  )
 
   return _build_dep_jsar(ctx, jsars + [src_jsar], output)
 
 
 def _js_library_impl(ctx):
   jsar = ctx.outputs.jsar
-  build_jsar(ctx, ctx.files.srcs, [], jsar)
+  build_jsar(ctx, ctx.files.srcs, ctx.attr.package, [], jsar)
 
   ts_defs = depset()
   if ctx.attr.ts_defs:
@@ -147,12 +154,13 @@ def node_driver(ctx, output, jsar, node, arguments=[]):
 
 def _js_binary_impl(ctx):
   jsar = build_jsar(ctx,
-    files  = ctx.files.src,
-    jsars  = transitive_jsars(ctx.attr.deps),
-    output = ctx.outputs.jsar,
+    files   = ctx.files.src,
+    package = None,
+    jsars   = transitive_jsars(ctx.attr.deps),
+    output  = ctx.outputs.jsar,
   )
 
-  arguments = ['./node_modules/%s' % _jsar_path(ctx.file.src)]
+  arguments = ['./node_modules/%s' % _jsar_path(ctx.file.src, None)]
 
   node_driver(ctx,
     output    = ctx.outputs.executable,
@@ -216,6 +224,12 @@ js_library = rule(
     'srcs':    attr.label_list(allow_files=True),
     'deps':    js_dep_attr,
     'ts_defs': attr.label(providers=['ts_defs']),
+
+    'package': attr.string(
+      mandatory = False,
+      doc = 'Allows this module to be imported from this location instead of ' +
+            'the path where it resides in this workspace.'),
+
     '_jsar':   jsar_attr,
   },
   outputs = {

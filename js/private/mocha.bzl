@@ -27,9 +27,10 @@ def _js_test_impl(ctx):
   arguments += ['node_modules/%s' % src.short_path for src in ctx.files.srcs]
 
   jsar = build_jsar(ctx,
-    files  = ctx.files.srcs,
-    jsars  = transitive_jsars(deps),
-    output = ctx.outputs.jsar,
+    files   = ctx.files.srcs,
+    jsars   = transitive_jsars(deps),
+    output  = ctx.outputs.jsar,
+    package = None,
   )
 
   node_driver(ctx,
