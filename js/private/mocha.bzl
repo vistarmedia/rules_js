@@ -19,6 +19,9 @@ def _js_test_impl(ctx):
     '--require=source-map-support/register',
   ]
 
+  arguments += \
+    ['--require=node_modules/%s' % src.short_path for src in ctx.files.requires]
+
   if ctx.attr.reporter:
     reporter = ctx.attr.reporter
     deps += [reporter]
@@ -27,7 +30,7 @@ def _js_test_impl(ctx):
   arguments += ['node_modules/%s' % src.short_path for src in ctx.files.srcs]
 
   jsar = build_jsar(ctx,
-    files   = ctx.files.srcs,
+    files   = ctx.files.srcs + ctx.files.requires,
     jsars   = transitive_jsars(deps),
     output  = ctx.outputs.jsar,
     package = None,
@@ -63,6 +66,7 @@ js_test = rule(
     'deps':                js_dep_attr,
     'mocha_timeout':       attr.string(default='0'),
     'data':                attr.label_list(allow_files=True, cfg='data'),
+    'requires':            attr.label_list(allow_files=True),
     'reporter':            attr.label(),
     '_node':               node_attr,
     '_jsar':               jsar_attr,
