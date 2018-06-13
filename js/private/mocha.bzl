@@ -15,7 +15,6 @@ def _js_test_impl(ctx):
 
   arguments = [
     'node_modules/mocha/bin/mocha',
-    '--timeout=%s' % ctx.attr.mocha_timeout,
     '--require=source-map-support/register',
   ]
 
@@ -64,7 +63,6 @@ js_test = rule(
   attrs = {
     'srcs':                attr.label_list(allow_files=True),
     'deps':                js_dep_attr,
-    'mocha_timeout':       attr.string(default='0'),
     'data':                attr.label_list(allow_files=True, cfg='data'),
     'requires':            attr.label_list(allow_files=True),
     'reporter':            attr.label(),
