@@ -38,6 +38,11 @@ def _uglify_impl(ctx):
     ctx.file.src.path,
   ]
 
+  if ctx.attr.compress:
+    arguments.append('--compress')
+  if ctx.attr.mangle:
+    arguments.append('--mangle')
+
   ctx.action(
     executable = ctx.executable._uglify,
     arguments  = arguments,
@@ -81,6 +86,8 @@ _uglify = rule(
   _uglify_impl,
 
   attrs = {
+    'compress': attr.bool(default=True, mandatory=False),
+    'mangle': attr.bool(default=True, mandatory=False),
     'src':  attr.label(single_file=True),
 
     '_uglify': attr.label(
