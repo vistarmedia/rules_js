@@ -19,5 +19,6 @@ go_rules_dependencies()
 go_register_toolchains()
 gazelle_dependencies()
 
-load("//js/private:node.bzl", "js_repositories")
+load('//js:def.bzl', 'js_repositories', 'chai_repositories')
 js_repositories()
+chai_repositories()

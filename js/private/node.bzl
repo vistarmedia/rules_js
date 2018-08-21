@@ -145,6 +145,7 @@ def js_repositories():
       'growl',
     ],
   )
+
   npm_install(
     name = 'source-map-support',
     version = '0.4.18',
@@ -230,4 +231,45 @@ def js_repositories():
       'commander',
       'source-map',
     ]
+  )
+
+def chai_repositories():
+
+  # Grab Chai + dependencies
+  npm_install(
+    name = 'assertion-error',
+    version = '1.0.2',
+    sha256 = 'fcfb6f6be3104cb342819ca025bb310abab104fc90b882a1a2cddb4cd6139fb9',
+  )
+  npm_install(
+    name = 'check-error',
+    version = '1.0.2',
+    sha256 = '92554b32cbf947c79e2832277ee730015408dd75e753ee320ba1fc7bf5915dda',
+  )
+  npm_install(
+    name = 'deep-eql',
+    version = '2.0.1',
+    sha256 = 'c4910d20b5818c1c48941dc3719800b511f44974c66e8145d968cfccf43870c5',
+  )
+  npm_install(
+    name = 'get-func-name',
+    version = '2.0.0',
+    sha256 = '791183ec55849b4e8fb87b356a6060d5a14dd72f1fe821750af8300e9afb4866',
+  )
+  npm_install(
+    name = 'pathval',
+    version = '1.1.0',
+    sha256 = 'a950d68b409ee5daf91923ce180bab7dc1c93210ee29adbce1026be1ca04d541',
+  )
+  npm_install(
+    name = 'type-detect',
+    version = '4.0.0',
+    sha256 = 'b600316f3f9dcb311a8be4f27e972fa5b5db5616cdfadf299225e0f56d5569a9',
+  )
+  npm_install(
+    name = 'chai',
+    version = '4.0.2',
+    sha256 = '36136ff5b9764f58b304b855f12cad26bb885ea763999d7d07862a23b275d557',
+    type_version = '4.0.2',
+    type_sha256 = 'e966f65644fc50df3550287e20ae61de9255331bfcb2a23ae3878cc1e7763573',
   )
