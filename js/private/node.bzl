@@ -3,22 +3,22 @@ load('//js/private:npm.bzl', 'npm_install', 'npm_tarball_install')
 def _node_buildfile(arch):
   return '\n'.join([
     'package(default_visibility=["//visibility:public"])',
-    'filegroup(name="node", srcs=["node-v6.2.2-%s/bin/node"])' % arch
+    'filegroup(name="node", srcs=["node-v8.11.4-%s/bin/node"])' % arch
   ])
 
 
 def js_repositories():
   native.new_http_archive(
     name = 'nodejs_linux_amd64',
-    url = 'https://nodejs.org/dist/v6.2.2/node-v6.2.2-linux-x64.tar.gz',
-    sha256 = '7a6df881183e70839857b51653811aaabc49a2ffb93416a1c9bd333dcef84ea3',
+    url = 'http://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.gz',
+    sha256 = 'c69abe770f002a7415bd00f7ea13b086650c1dd925ef0c3bf8de90eabecc8790',
     build_file_content = _node_buildfile('linux-x64'),
   )
 
   native.new_http_archive(
     name = 'nodejs_darwin_amd64',
-    url = 'https://nodejs.org/dist/v6.2.2/node-v6.2.2-darwin-x64.tar.gz',
-    sha256 = '03b9eadd71d73daf2a25c8ea833454b326cb702f717a39f1b2a1324179cab5fa',
+    url = 'http://nodejs.org/dist/v8.11.4/node-v8.11.4-darwin-x64.tar.gz',
+    sha256 = 'aa1de83b388581d0d9ec3276f4526ee67e17e0f1bc0deb5133f960ce5dc9f1ef',
     build_file_content = _node_buildfile('darwin-x64'),
   )
 
