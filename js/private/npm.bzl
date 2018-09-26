@@ -71,7 +71,7 @@ def _create_workspace(ctx, tarballs):
   if ctx.attr.rename:
     cmd += ['--rename', ctx.attr.package + ':' + ctx.attr.name]
 
-  ctx.execute(cmd)
+  ctx.execute(cmd, quiet=False)
 
 
 def _npm_install_impl(ctx):
