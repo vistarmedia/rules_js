@@ -1,15 +1,31 @@
-js_type          = FileType(['.js'])
-js_dep_providers = ['jsar', 'deps']
+js_lib_providers = ['jsar', 'runtime_deps', 'compile_deps']
+js_bin_providers = ['jsar', 'runtime_deps']
 
 
-def transitive_jsars(deps):
+def runtime_deps(deps):
+  """
+  Set of transitive jsar files needed to run this target
+  """
   jsars = depset()
   for dep in deps:
-    jsars += dep.deps | [dep.jsar]
+    jsars += dep.runtime_deps.union([dep.jsar])
   return jsars
+
+def compile_deps(deps):
+  """
+  Set of transitive jsar files needed to compile this target
+  """
+  cjsars = depset()
+  for dep in deps:
+    cjsars += dep.compile_deps.union([dep.cjsar])
+  return cjsars
 
 
 def _jsar_impl(ctx):
+  """
+  Creates a raw js_library from a tarball. The resulting target will have the
+  same runtime and compile deps.
+  """
   tar  = ctx.file.tar
   jsar = ctx.outputs.jsar
 
@@ -30,7 +46,10 @@ def _jsar_impl(ctx):
   return struct(
     files = depset([jsar]),
     jsar  = jsar,
-    deps  = transitive_jsars(ctx.attr.deps),
+    cjsar = jsar,
+
+    runtime_deps = runtime_deps(ctx.attr.deps),
+    compile_deps = compile_deps(ctx.attr.deps),
   )
 
 def _jsar_path(src, package):
@@ -79,6 +98,10 @@ def _build_dep_jsar(ctx, deps, output):
 
 
 def build_jsar(ctx, files, package, jsars, output):
+  """
+  Builds and returns a fat jsar with this library and all its transitive
+  dependencies
+  """
   src_jsar = _build_src_jsar(
     ctx     = ctx,
     srcs    = files,
@@ -90,18 +113,38 @@ def build_jsar(ctx, files, package, jsars, output):
 
 
 def _js_library_impl(ctx):
-  jsar = ctx.outputs.jsar
-  build_jsar(ctx, ctx.files.srcs, ctx.attr.package, [], jsar)
+  jsar  = ctx.outputs.jsar
+  cjsar = ctx.outputs.cjsar
+
+  # Package all library files into the jsar
+  _build_src_jsar(
+    ctx     = ctx,
+    srcs    = ctx.files.srcs,
+    package = ctx.attr.package,
+    output  = jsar,
+  )
+
+  # Package all compile-time files into the cjsar
+  compile_type = FileType(ctx.attr.compile_type)
+  _build_src_jsar(
+    ctx     = ctx,
+    srcs    = compile_type.filter(ctx.files.srcs),
+    package = ctx.attr.package,
+    output  = cjsar,
+  )
 
   ts_defs = depset()
   if ctx.attr.ts_defs:
     ts_defs = ctx.attr.ts_defs.ts_defs
 
   return struct(
-    files   = depset([jsar]),
+    files   = depset([jsar, cjsar]),
     jsar    = jsar,
-    deps    = transitive_jsars(ctx.attr.deps),
+    cjsar   = cjsar,
     ts_defs = ts_defs,
+
+    runtime_deps = runtime_deps(ctx.attr.deps),
+    compile_deps = compile_deps(ctx.attr.deps),
   )
 
 
@@ -156,7 +199,7 @@ def _js_binary_impl(ctx):
   jsar = build_jsar(ctx,
     files   = ctx.files.src,
     package = None,
-    jsars   = transitive_jsars(ctx.attr.deps),
+    jsars   = runtime_deps(ctx.attr.deps),
     output  = ctx.outputs.jsar,
   )
 
@@ -182,8 +225,10 @@ def _js_binary_impl(ctx):
     files    = depset([jsar]),
     runfiles = runfiles,
     jsar     = jsar,
-    deps     = depset(),
     main     = ctx.file.src,
+
+    runtime_deps = depset(),
+    compile_deps = depset(),
   )
 
 # ------------------------------------------------------------------------------
@@ -199,7 +244,8 @@ node_attr = attr.label(
   executable  = True,
   allow_files = True)
 
-js_dep_attr = attr.label_list(providers=js_dep_providers)
+js_lib_attr = attr.label_list(providers=js_lib_providers)
+js_bin_attr = attr.label_list(providers=js_bin_providers)
 
 
 jsar = rule(
@@ -210,7 +256,7 @@ jsar = rule(
       single_file = True,
       mandatory   = True),
 
-    'deps':  js_dep_attr,
+    'deps':  js_lib_attr,
     '_jsar': jsar_attr,
   },
   outputs = {
@@ -222,8 +268,13 @@ js_library = rule(
   _js_library_impl,
   attrs = {
     'srcs':    attr.label_list(allow_files=True),
-    'deps':    js_dep_attr,
+    'deps':    js_lib_attr,
     'ts_defs': attr.label(providers=['ts_defs']),
+
+    'compile_type': attr.string_list(
+      default = ['.d.ts'],
+      doc = 'filetypes which will be included in the compile-time output',
+    ),
 
     'package': attr.string(
       mandatory = False,
@@ -233,7 +284,8 @@ js_library = rule(
     '_jsar':   jsar_attr,
   },
   outputs = {
-    'jsar': '%{name}.jsar',
+    'jsar':  '%{name}.jsar',
+    'cjsar': '%{name}.cjsar',
   },
 )
 
@@ -242,7 +294,7 @@ js_binary = rule(
   executable = True,
   attrs = {
     'src':     attr.label(allow_files=True, single_file=True),
-    'deps':    js_dep_attr,
+    'deps':    js_bin_attr,
     '_jsar':   jsar_attr,
     '_node':   node_attr,
   },

@@ -1,10 +1,10 @@
 load('@io_bazel_rules_js//js/private:rules.bzl',
   'build_jsar',
   'node_driver',
-  'transitive_jsars',
+  'runtime_deps',
   'jsar_attr',
   'node_attr',
-  'js_dep_attr')
+  'js_lib_attr')
 
 
 def _js_test_impl(ctx):
@@ -30,7 +30,7 @@ def _js_test_impl(ctx):
 
   jsar = build_jsar(ctx,
     files   = ctx.files.srcs + ctx.files.requires,
-    jsars   = transitive_jsars(deps),
+    jsars   = runtime_deps(deps),
     output  = ctx.outputs.jsar,
     package = None,
   )
@@ -62,7 +62,7 @@ js_test = rule(
   test = True,
   attrs = {
     'srcs':                attr.label_list(allow_files=True),
-    'deps':                js_dep_attr,
+    'deps':                js_lib_attr,
     'data':                attr.label_list(allow_files=True, cfg='data'),
     'requires':            attr.label_list(allow_files=True),
     'reporter':            attr.label(),
