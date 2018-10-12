@@ -1,0 +1,59 @@
+{
+    "package": "blaze.worker",
+    "options": {
+        "java_package": "com.google.devtools.build.lib.worker"
+    },
+    "messages": [
+        {
+            "name": "Input",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "path",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "bytes",
+                    "name": "digest",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "WorkRequest",
+            "fields": [
+                {
+                    "rule": "repeated",
+                    "type": "string",
+                    "name": "arguments",
+                    "id": 1
+                },
+                {
+                    "rule": "repeated",
+                    "type": "Input",
+                    "name": "inputs",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "WorkResponse",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "exit_code",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "output",
+                    "id": 2
+                }
+            ]
+        }
+    ]
+}

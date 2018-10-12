@@ -1,10 +1,17 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary")
+load("@io_bazel_rules_js//js:def.bzl", "js_library")
 
 go_binary(
     name = "jsar-bin",
     srcs = ["jsar.go"],
     visibility = ["//visibility:public"],
     deps = ["@io_bazel_rules_js//js/tools/jsar:go_default_library"],
+)
+
+js_library(
+    name = "varint",
+    srcs = ["varint.js"],
+    visibility = [":__subpackages__"],
 )
 
 sh_test(

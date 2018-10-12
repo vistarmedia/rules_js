@@ -12,6 +12,10 @@ js_library(
     name = "jsar",
     srcs = ["jsar.js"],
     visibility = ["//visibility:public"],
+    deps = [
+        "//js/tools:varint",
+        "@node//:lib",
+    ],
 )
 
 js_test(

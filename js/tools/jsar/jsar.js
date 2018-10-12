@@ -1,5 +1,7 @@
 const zlib = require('zlib')
 
+const {readUnsignedVarint32} = require('../varint');
+
 /**
  * Unbundles a jsar buffer and returns the files in memory
  * @param {Buffer} buffer - The jsar buffer
@@ -37,22 +39,7 @@ function unbundle(buffer) {
   })
 }
 
-function readUnsignedVarint32(a, offset) {
-  let b;
-  let result = 0;
-  let intOffset = 0
-
-  for (let i = 0; i < 5; i++) {
-    b = a[offset + intOffset++];
-    result |= (b & 0x7F) << (7 * i);
-    if (!(b & 0x80)) {
-      break;
-    }
-  }
-
-  return { value: result, length: intOffset };
-}
 
 module.exports = {
-  unbundle
+  unbundle,
 }
