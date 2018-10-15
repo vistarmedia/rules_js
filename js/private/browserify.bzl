@@ -62,10 +62,11 @@ _browserify = rule(
   attrs = {
     'entrypoint': attr.label(providers=['main']),
 
+    # See cfg note in @io_bazel_rules_js//:README.md
     'bundler': attr.label(
       executable = True,
       providers = ['main'],
-      cfg = 'host'),
+      cfg = 'target'),
 
     'env': attr.string_dict(default={}),
 
@@ -90,10 +91,11 @@ _uglify = rule(
     'mangle': attr.bool(default=True, mandatory=False),
     'src':  attr.label(single_file=True),
 
+    # See cfg note in @io_bazel_rules_js//:README.md
     '_uglify': attr.label(
       default = Label('@io_bazel_rules_js//js/toolchain:uglify'),
       executable = True,
-      cfg = 'host'),
+      cfg = 'target'),
 
     '_node': node_attr,
   },
@@ -120,6 +122,12 @@ def js_bundle(name, bin, minified=False, **kwargs):
       '@loose.envify//:lib',
       '@uglifyjs//:lib',
     ],
+
+    # Browserify *really* wants it resolve files at `$PWD/node_modules`.
+    # However, we cannot run simultanious targets all "sharing" a directory with
+    # that name, so we generally randomize it. In Browserify's case, it never
+    # runs concurrently, so we just give in to its demands.
+    random_libdir = False,
   )
 
   if minified:

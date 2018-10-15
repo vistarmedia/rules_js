@@ -22,14 +22,10 @@ There are two public module rules
     )
     ```
 
-Note that each `src` passed to a `js_binary` rule will run with a new invocation
-of Node, and it will silently ignore any `src` file that doesn't have a `.js`
-extension.
-
-Further, there is a WORKSPACE rule to install modules from NPM, optionally
-include their typescript definitions. `npm_install` will also take a `sha256`
-argument to verify against what's published on NPM as well as a `type_sha256`
-for the type declaration.
+There is a WORKSPACE rule to install modules from NPM, optionally include their
+typescript definitions. `npm_install` will also take a `sha256` argument to
+verify against what's published on NPM as well as a `type_sha256` for the type
+declaration.
 
     ```python
     load('@io_bazel_rules_js//js:def.bzl', 'npm_install')
@@ -79,15 +75,25 @@ Both presently work in nearly all cases, but the behavior is not guaranteed as
 these rules evolve.
 
 ## Design
-Each build target produces metadata and a binary Javascript archive, or `jsar`.
-Each `js_library` emits its own js runtime files as a gzipped tarfile. The path
-of the files will be the fully-qualified import path. The metadata is as
-follows:
+Each build target produces metadata and a two binary Javascript archives, or
+`jsar`. Each `js_library` emits its "runtime" and "compile-time" definitions as
+`jsar` files. The "runtime" is the source code required to use this library in a
+running process (ie -- all the source code). The "compile time" is just files
+needed to link this library to another. This only really makes sense in the case
+of TypeScript where `.d.ts` files are emitted, and those are the only files
+required to _compile_ other libraries which depend on this one. The runtime is
+still needed to execute.
+
+The metadata is as follows:
 
     ```python
     struct(
-      jsar = <this library's code>,
-      deps = set(<jsar>),
+      files = <runtime jsar + compile-time jsar>
+      jsar  = <this library's runtime code>
+      cjsar = <this library's compile-time definitions>
+
+      runtime_deps = <transitive set of runtime dependencies>
+      compile_deps = <transitive set of compile-time dependencies>
     )
     ```
 
@@ -98,4 +104,35 @@ then remove `./node_modules`.
 
 External dependencies created with `npm_install` will use a behind-the-scenes
 rule, `jsar` to directly create the tarfile containing the sources with working
-directly with `js_library`. This is subject to change.
+directly with `js_library`. These targets will have _all_ files included as
+compile-time deps
+
+## A word about Bazel configurations
+Bazel has a concept called
+[configurations](https://docs.bazel.build/versions/master/skylark/rules.html#configurations).
+This makes far more sense when considering native compilations like C++, but
+unfortunately Bazel doesn't know it doesn't matter for JavaScript. (or we're not
+good enough to program around it).
+
+The two primary ones are "target" and "host". If you run `bazel build ...`,
+Bazel will build "target" configurations -- ie: Artifacts for the platform where
+the code will be running. However, if you need an artifact that will run locally
+like a compiler or code-generator, that artifact must be compiled for "host."
+
+So, while building JS artifacts, you're creating many "target" artifacts.
+However, when running tests (or browserify, etc), an odd thing happens.
+
+* We want a `js_binary` that can resolve Mocha dependencies *and* resolve
+  whatever libraries we're passing to it for testing
+* This rule, logically, should have an attribute for Mocha with `cfg = "host"`,
+  as it'll be running locally.
+* Bazel infers that the dependencies will also need to be compiled for the
+  "host", but everything on disk is compiled for "target"
+* Bazel will now recompile all the `js_libraries` with a "host" configuration
+
+When doing `bazel test ...`, this _would_ first compile all libraries to the
+target configuration, then build them _again_ for the host (indicating it with
+the suffix `[for host]` on the build status).
+
+We circumvent this by specifically indicating that we want "target" binaries in
+our higher-order binary rules. It looks wrong. But that's why.

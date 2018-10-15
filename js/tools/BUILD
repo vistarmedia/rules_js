@@ -1,11 +1,24 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary")
-load("@io_bazel_rules_js//js:def.bzl", "js_library")
+load("@io_bazel_rules_js//js:def.bzl", "js_binary", "js_library")
 
 go_binary(
     name = "jsar-bin",
     srcs = ["jsar.go"],
     visibility = ["//visibility:public"],
     deps = ["@io_bazel_rules_js//js/tools/jsar:go_default_library"],
+)
+
+js_binary(
+    name = "mocha",
+    testonly = True,
+    src = "mocha.js",
+    visibility = ["//visibility:public"],
+    deps = ["@mocha//:lib"],
+)
+
+exports_files(
+    ["mocha.js"],
+    visibility = ["//visibility:public"],
 )
 
 js_library(

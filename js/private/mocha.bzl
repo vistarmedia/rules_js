@@ -1,78 +1,72 @@
-load('@io_bazel_rules_js//js/private:rules.bzl',
-  'build_jsar',
-  'node_driver',
-  'runtime_deps',
-  'jsar_attr',
-  'node_attr',
-  'js_lib_attr')
+load('@io_bazel_rules_js//js/private:rules.bzl', 'js_binary')
 
 
-def _js_test_impl(ctx):
-  deps = ctx.attr.deps + [
-    ctx.attr._mocha,
-    ctx.attr._source_map_support,
-  ]
-
-  arguments = [
-    'node_modules/mocha/bin/mocha',
-    '--require=source-map-support/register',
-  ]
-
-  arguments += \
-    ['--require=node_modules/%s' % src.short_path for src in ctx.files.requires]
+def _mocha_test_impl(ctx):
+  cmd = [ctx.executable.driver.short_path] + \
+        ['--require=source-map-support/register'] + \
+        ['--require=%s' % r.short_path for r in ctx.files.requires]
 
   if ctx.attr.reporter:
-    reporter = ctx.attr.reporter
-    deps += [reporter]
-    arguments += ['--reporter=' + reporter.label.package]
+    cmd += ['--reporter=' + ctx.attr.reporter.label.package]
 
-  arguments += ['node_modules/%s' % src.short_path for src in ctx.files.srcs]
+  cmd += [test.short_path for test in ctx.files.tests]
 
-  jsar = build_jsar(ctx,
-    files   = ctx.files.srcs + ctx.files.requires,
-    jsars   = runtime_deps(deps),
-    output  = ctx.outputs.jsar,
-    package = None,
-  )
+  script = [
+    '#!/bin/sh -e',
+    ' '.join(cmd),
+  ]
 
-  node_driver(ctx,
-    output    = ctx.outputs.executable,
-    jsar      = jsar,
-    node      = ctx.executable._node,
-    arguments = arguments,
+  ctx.actions.write(
+    output  = ctx.outputs.executable,
+    content = '\n'.join(script),
   )
 
   runfiles = ctx.runfiles(
-    files = [
-      ctx.executable._jsar,
-      ctx.executable._node,
-      jsar,
-    ] + ctx.files.data,
-    collect_default  = True,
-  )
+    files = ctx.files.tests + ctx.files.data + ctx.files.requires,
+  ).merge(ctx.attr.driver.default_runfiles)
 
-  return struct(
-    files    = depset([jsar, ctx.outputs.executable]),
+  return [DefaultInfo(
+    files = depset([ctx.outputs.executable]),
     runfiles = runfiles,
-  )
+  )]
 
 
-js_test = rule(
-  _js_test_impl,
+_mocha_test = rule(
+  _mocha_test_impl,
   test = True,
   attrs = {
-    'srcs':                attr.label_list(allow_files=True),
-    'deps':                js_lib_attr,
-    'data':                attr.label_list(allow_files=True, cfg='data'),
-    'requires':            attr.label_list(allow_files=True),
-    'reporter':            attr.label(),
-    '_node':               node_attr,
-    '_jsar':               jsar_attr,
-    '_mocha':              attr.label(default=Label('@mocha//:lib')),
-    '_source_map_support': attr.label(
-                             default=Label('@source.map.support//:lib')),
-  },
-  outputs = {
-    'jsar': '%{name}.jsar',
+    # See cfg note in @io_bazel_rules_js//:README.md
+    'tests':    attr.label_list(allow_files=True, cfg='target'),
+    'requires': attr.label_list(allow_files=True),
+    'data':     attr.label_list(),
+    'reporter': attr.label(),
+
+    # See cfg note in @io_bazel_rules_js//:README.md
+    'driver':   attr.label(executable=True, cfg='target'),
   },
 )
+
+
+def mocha_test(name, deps, srcs, reporter=None, **kwargs):
+  all_deps = deps + [
+    '@mocha//:lib',
+    '@source.map.support//:lib',
+  ]
+  if reporter:
+    all_deps += [reporter]
+
+  js_binary(
+    name     = name + '.driver',
+    testonly = True,
+    src      = '@io_bazel_rules_js//js/tools:mocha.js',
+    deps     = all_deps,
+  )
+
+  _mocha_test(
+    name     = name,
+    driver   = name +'.driver',
+    tests    = srcs,
+    reporter = reporter,
+    **kwargs)
+
+js_test = mocha_test

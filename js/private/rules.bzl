@@ -148,8 +148,13 @@ def _js_library_impl(ctx):
   )
 
 
-def node_driver(ctx, output, jsar, node, arguments=[]):
+def node_driver(ctx, output, jsar, node, random_libdir, cmd, arguments=[]):
   safe_args = ["'%s'" % arg for arg in arguments]
+
+  # See the documentation for `create_libdir` in the rule attribute declaration
+  create_libdir = 'LIBDIR=$(mktemp -d --suffix=.node_driver)'
+  if not random_libdir:
+    create_libdir = 'LIBDIR=./node_modules && mkdir ./node_modules'
 
   content = [
     '#!/bin/bash -eu',
@@ -173,18 +178,21 @@ def node_driver(ctx, output, jsar, node, arguments=[]):
 
     'export RUNFILES="${runfiles_root}/%s"' % ctx.workspace_name,
 
-    'if ! [[ -d ./node_modules ]]; then',
-    '  mkdir ./node_modules',
-    '  trap "{ rm -rf ./node_modules ; }" EXIT',
-    'fi',
+    # Creates a home to store all 3rd-party JS code needed for this binary
+    # target to run. Unless `random_libdir` is set to `False`, this will be a
+    # random directory in the tmp filesystem
+    create_libdir,
+    'trap "{ rm -rf $LIBDIR ; }" EXIT',
 
-    '${RUNFILES}/%s unbundle -output ./node_modules "${RUNFILES}/%s"' % (
+    '${RUNFILES}/%s unbundle -output $LIBDIR "${RUNFILES}/%s"' % (
       ctx.executable._jsar.short_path,
       jsar.short_path),
 
-    'NODEPATH=$PWD {node} {arguments} "$@"'.format(
+    'export NODE_PATH=$LIBDIR',
+    '{node} $LIBDIR/{cmd} {arguments} "$@"'.format(
       node      = node.path,
-      arguments = ' '.join(safe_args)
+      cmd       = cmd,
+      arguments = ' '.join(safe_args),
     ),
   ]
 
@@ -203,13 +211,12 @@ def _js_binary_impl(ctx):
     output  = ctx.outputs.jsar,
   )
 
-  arguments = ['./node_modules/%s' % _jsar_path(ctx.file.src, None)]
-
   node_driver(ctx,
-    output    = ctx.outputs.executable,
-    jsar      = jsar,
-    node      = ctx.executable._node,
-    arguments = arguments,
+    output        = ctx.outputs.executable,
+    jsar          = jsar,
+    node          = ctx.executable._node,
+    random_libdir = ctx.attr.random_libdir,
+    cmd           = _jsar_path(ctx.file.src, None),
   )
 
   runfiles = ctx.runfiles(
@@ -244,8 +251,8 @@ node_attr = attr.label(
   executable  = True,
   allow_files = True)
 
-js_lib_attr = attr.label_list(providers=js_lib_providers)
-js_bin_attr = attr.label_list(providers=js_bin_providers)
+js_lib_attr = attr.label_list(providers=js_lib_providers, cfg='target')
+js_bin_attr = attr.label_list(providers=js_bin_providers, cfg='target')
 
 
 jsar = rule(
@@ -293,10 +300,16 @@ js_binary = rule(
   _js_binary_impl,
   executable = True,
   attrs = {
-    'src':     attr.label(allow_files=True, single_file=True),
-    'deps':    js_bin_attr,
-    '_jsar':   jsar_attr,
-    '_node':   node_attr,
+    'src':  attr.label(allow_files=True, single_file=True),
+    'deps': js_bin_attr,
+
+    'random_libdir': attr.bool(default=True,
+      doc = 'By default, expand node dependencies into a random directory. ' +
+            'However, in some cases, a predictable node_modules may be ' +
+            'required. This this flag to False for those cases.'),
+
+    '_jsar': jsar_attr,
+    '_node': node_attr,
   },
   outputs = {
     'jsar': '%{name}.jsar',
