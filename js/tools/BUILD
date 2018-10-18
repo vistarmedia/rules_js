@@ -5,7 +5,10 @@ go_binary(
     name = "jsar-bin",
     srcs = ["jsar.go"],
     visibility = ["//visibility:public"],
-    deps = ["@io_bazel_rules_js//js/tools/jsar:go_default_library"],
+    deps = [
+        "@com_github_pkg_errors//:go_default_library",
+        "@io_bazel_rules_js//js/tools/jsar:go_default_library",
+    ],
 )
 
 js_binary(

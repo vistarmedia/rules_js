@@ -4,7 +4,6 @@ package main
 import (
 	"archive/tar"
 	"compress/gzip"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -13,6 +12,8 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"vistarmedia.com/rules_js/js/tools/jsar"
 )
@@ -129,7 +130,7 @@ func unbundle(cmd string, args []string) error {
 
 	for _, jsar := range flagSet.Args() {
 		if err := unbundleTo(jsar, *output); err != nil {
-			return err
+			return errors.Wrapf(err, "Error extracting %s to %s", jsar, *output)
 		}
 	}
 

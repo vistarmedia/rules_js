@@ -19,6 +19,14 @@ go_rules_dependencies()
 go_register_toolchains()
 gazelle_dependencies()
 
+load("@bazel_gazelle//:deps.bzl", "go_repository")
+go_repository(
+  name       = 'com_github_pkg_errors',
+  importpath = 'github.com/pkg/errors',
+  tag        = 'v0.8.0',
+)
+
+
 load('//js:def.bzl', 'js_repositories', 'chai_repositories')
 js_repositories()
 chai_repositories()
