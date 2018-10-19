@@ -229,7 +229,7 @@ def _js_binary_impl(ctx):
   )
 
   return struct(
-    files    = depset([jsar]),
+    files    = depset([ctx.outputs.executable]),
     runfiles = runfiles,
     jsar     = jsar,
     main     = ctx.file.src,
