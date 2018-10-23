@@ -80,7 +80,7 @@ async function workUnsafe(fun, flagPrefix="--flagfile=", argv=process.argv) {
     try {
       return await fun(workInput);
     } catch (err) {
-      return {exitCode: 1, output: err.toString()};
+      return {exitCode: 1, output: err.stack};
     }
   }
 
@@ -141,7 +141,7 @@ async function work() {
     await workUnsafe.apply(null, arguments);
     process.exit(0);
   } catch(err) {
-    console.error(err);
+    console.error(err.stack);
     process.exit(2);
   }
 }
