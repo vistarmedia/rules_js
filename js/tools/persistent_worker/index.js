@@ -76,9 +76,9 @@ async function workUnsafe(fun, flagPrefix="--flagfile=", argv=process.argv) {
   const args    = argv.slice(2);
   const input   = process.stdin;
   const output  = process.stdout;
-  const safeFun = async (workInput) => {
+  const safeFun = async (workInput, inputs) => {
     try {
-      return await fun(workInput);
+      return await fun(workInput, inputs);
     } catch (err) {
       return {exitCode: 1, output: err.stack};
     }
@@ -96,7 +96,7 @@ async function workUnsafe(fun, flagPrefix="--flagfile=", argv=process.argv) {
   // Running one-shot
   if(arg.startsWith(flagPrefix)) {
     const workInput = await readWorkInput(flagPrefix, arg);
-    const {errorCode, output} = await safeFun(workInput);
+    const {errorCode, output} = await safeFun(workInput, []);
     if(output) {
       console.log(output);
     }
@@ -108,7 +108,7 @@ async function workUnsafe(fun, flagPrefix="--flagfile=", argv=process.argv) {
     const onWork = async (request) => {
       const arg = request.arguments[0];
       const workInput = await readWorkInput(flagPrefix, arg);
-      writeWorkResponse(output, await safeFun(workInput));
+      writeWorkResponse(output, await safeFun(workInput, request.inputs));
     }
     return new Promise((resolve) => {
       readWorkRequests(input, onWork, resolve);
