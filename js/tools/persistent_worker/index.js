@@ -96,11 +96,11 @@ async function workUnsafe(fun, flagPrefix="--flagfile=", argv=process.argv) {
   // Running one-shot
   if(arg.startsWith(flagPrefix)) {
     const workInput = await readWorkInput(flagPrefix, arg);
-    const {errorCode, output} = await safeFun(workInput, []);
+    const {exitCode, output} = await safeFun(workInput, []);
     if(output) {
       console.log(output);
     }
-    process.exit(errorCode);
+    process.exit(exitCode);
   }
 
   // Running persistent
@@ -120,10 +120,10 @@ async function workUnsafe(fun, flagPrefix="--flagfile=", argv=process.argv) {
 
 /**
  * Runs a unit of work as either a one-shot or persisted worker. The given
- * function is assumed to be asynchronous, and *must* return a value in the shape
- * of `{errorCode: int, output: string}`. At present, a worker must accept only
- * one argument on the command line. Either an instruction to run persistent, or
- * the location of its arguments.
+ * function is assumed to be asynchronous, and *must* return a value in the
+ * shape of `{exitCode: int, output: string}`. At present, a worker must accept
+ * only one argument on the command line. Either an instruction to run
+ * persistent, or the location of its arguments.
  *
  * If the executable is launched with `--persistent_worker` as any of the given
  * arguments, it will be persistent. As it stands, this must be the only
