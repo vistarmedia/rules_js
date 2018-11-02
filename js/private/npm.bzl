@@ -71,7 +71,10 @@ def _create_workspace(ctx, tarballs):
   if ctx.attr.rename:
     cmd += ['--rename', ctx.attr.package + ':' + ctx.attr.name]
 
-  ctx.execute(cmd, quiet=False)
+  result = ctx.execute(cmd, quiet=False)
+  if result.return_code:
+    fail("npm_to_jsar failed:\nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout,
+      result.stderr))
 
 
 def _npm_install_impl(ctx):
