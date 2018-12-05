@@ -3,6 +3,8 @@ def _external_name(name):
   Bazel does not allow dashes in external names. Follow the convention of
   replacing dashes with dots. Consumers of NPM dependencies need to be aware of
   this rule
+  Make sure to keep this in sync with _external_name in
+    tools/build_rules/rules_js/js/tools/npm_to_jsar.py
   """
   return name.replace('-', '.')\
              .replace('/', '.')\

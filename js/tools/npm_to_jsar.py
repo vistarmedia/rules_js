@@ -93,6 +93,18 @@ def _copy_tar_files(src, dst, ignore_paths, rename):
   return deps
 
 
+def _external_name(name):
+  """
+  Bazel does not allow dashes in external names. Follow the convention of
+  replacing dashes with dots. Consumers of NPM dependencies need to be aware of
+  this rule.
+  Make sure to keep this in sync with _external_name in
+    //tools/build_rules/rules_js/js/private:npm.bzl
+  """
+  return name.replace('-', '.')\
+             .replace('/', '.')\
+             .replace('@', '')
+
 def _write_buildfile(filename, deps, js_tar_name, ignore_deps,
                      visibility=None):
   if visibility is None:
@@ -106,7 +118,8 @@ def _write_buildfile(filename, deps, js_tar_name, ignore_deps,
   for dep in sorted(deps.keys()):
     if dep in to_ignore: continue
 
-    bazel_name = dep.replace('-', '.')
+    bazel_name = _external_name(dep)
+
     if bazel_name in to_ignore: continue
 
     version = deps[dep]
