@@ -6,6 +6,59 @@ def _node_buildfile(arch):
     'filegroup(name="node", srcs=["node-v8.11.4-%s/bin/node"])' % arch
   ])
 
+def init_protobufjs():
+  npm_install(
+    name = 'ascli',
+    version = '1.0.1',
+    sha256 = '4780444b47435b1dcdc18f77d2b2bca7a3fbb65bcac936e70c979475b9402a57',
+  )
+  npm_install(
+    name = 'bytebuffer',
+    version = '5.0.1',
+    sha256 = '84667a6bc80943e9ea346dfc073e55b55127ef787b4b5293532755da452025a0',
+    type_version = '5.0.33',
+    type_sha256 = 'c9b5f6b9f776f65c78e1201db7283cf2a99847b750750c9bfdc001214daf9566',
+  )
+  npm_install(
+    name = 'colour',
+    version = '0.7.1',
+    sha256 = 'c3408547bdebec2bff85f77583e01b8bf033a0ab41a583abd00cea9f860e6d7c',
+  )
+  npm_install(
+    name = 'glob',
+    version = '5.0.10',
+    sha256 = '17232040681c8bfa5badd0801a977fa79c05f0388974e8921fffabd380d10c0b',
+  )
+  npm_install(
+    name = 'long',
+    version = '3.2.0',
+    sha256 = 'a5b10daf8eaa2e6507a3e9e648016cdc9777857ad501917316a5228aa5f3d9cb',
+  )
+  npm_install(
+    name = 'open',
+    version = '0.0.3',
+    sha256 = 'd14309b2d4a4952181b36cb0152ecb3d57954e69720791386b424cd0e2710c42',
+  )
+  npm_install(
+    name = 'optjs',
+    version = '3.2.1-boom',
+    sha256 = '30ace3018b46398c9974c4b3019d118edbce8158c3f6cd6a70837d0d432d83f0',
+  )
+  npm_install(
+    name = 'protobufjs',
+    version = '5.0.1',
+    sha256 = '84200a7a9eaad021919f92e45d1e8d1a39677a7f9ca00e72a562ab252ababe4b',
+    type_version = '5.0.31',
+    type_sha256 = '77c608742898728048cba56ad665ea91d9d54ff47c10dc25e6038620165176b6',
+    ignore_deps = [
+      'ws'
+    ],
+  )
+  npm_install(
+    name = 'yargs',
+    version = '3.10.0',
+    sha256 = 'f4bbe0435653161297be291f57d3581ec8f9eaf2660e5d7758ad8dc9018b4a75',
+  )
 
 def js_repositories():
   native.new_http_archive(

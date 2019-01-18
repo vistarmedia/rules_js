@@ -14,7 +14,6 @@ js_library(
     visibility = ["//visibility:public"],
     deps = [
         "//js/tools:varint",
-        "@node//:lib",
     ],
 )
 

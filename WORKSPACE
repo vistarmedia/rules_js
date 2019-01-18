@@ -26,7 +26,10 @@ go_repository(
   tag        = 'v0.8.0',
 )
 
+load("//js:def.bzl", "js_repositories", "chai_repositories", "init_protobufjs")
 
-load('//js:def.bzl', 'js_repositories', 'chai_repositories')
 js_repositories()
+
 chai_repositories()
+
+init_protobufjs()
