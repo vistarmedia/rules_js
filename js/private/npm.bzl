@@ -23,16 +23,15 @@ def _download_tarball(ctx, name, url, sha256=None):
 
 
 def _npm_registry_url(package, version, namespace=None):
-  url_safe_package = package.replace('/', '%2F')
   url_fragments = ['http://registry.npmjs.org']
 
   if namespace:
     url_fragments.append(namespace)
 
   url_fragments += [
-    url_safe_package,
+    package,
     '-',
-    '%s-%s.tgz' % (url_safe_package, version),
+    '%s-%s.tgz' % (package, version),
   ]
 
   return '/'.join(url_fragments)
