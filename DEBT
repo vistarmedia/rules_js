@@ -8,3 +8,5 @@
   by writing (hard|sym) links to existing files -- the format need not be
   portable across machines.
 * The `js_bundle` rules have no tests
+* `js_library` data files are included in the jsar for compatibility reasons.
+  This should be migrated to accumulate and expose to binary rules

@@ -119,7 +119,7 @@ def _js_library_impl(ctx):
   # Package all library files into the jsar
   _build_src_jsar(
     ctx     = ctx,
-    srcs    = ctx.files.srcs,
+    srcs    = ctx.files.srcs + ctx.files.data,
     package = ctx.attr.package,
     output  = jsar,
   )
@@ -224,7 +224,7 @@ def _js_binary_impl(ctx):
       jsar,
       ctx.executable._node,
       ctx.executable._jsar,
-    ],
+    ] + ctx.files.data,
     collect_default = True,
   )
 
@@ -277,6 +277,8 @@ js_library = rule(
     'srcs':    attr.label_list(allow_files=True),
     'deps':    js_lib_attr,
     'ts_defs': attr.label(providers=['ts_defs']),
+    'data':    attr.label_list(allow_files=True,
+      doc = 'Files to include in this library default jsar'),
 
     'compile_type': attr.string_list(
       default = ['.d.ts'],
@@ -302,6 +304,8 @@ js_binary = rule(
   attrs = {
     'src':  attr.label(allow_files=True, single_file=True),
     'deps': js_bin_attr,
+    'data':    attr.label_list(allow_files=True,
+      doc = 'Files visible to this bin at runtime'),
 
     'random_libdir': attr.bool(default=True,
       doc = 'By default, expand node dependencies into a random directory. ' +
