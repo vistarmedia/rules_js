@@ -6,7 +6,7 @@ run with Node, library targets produce concise binary build artifacts.
 There are two public module rules
 
     ```python
-    load('@io_bazel_rules_js//js:def.bzl',
+    load('@com_vistarmedia_rules_js//js:def.bzl',
       'js_binary',
       'js_library')
 
@@ -28,7 +28,7 @@ verify against what's published on NPM as well as a `type_sha256` for the type
 declaration.
 
     ```python
-    load('@io_bazel_rules_js//js:def.bzl', 'npm_install')
+    load('@com_vistarmedia_rules_js//js:def.bzl', 'npm_install')
     npm_install('immutable', version='3.8.1', type_version='3.8.1')
     ```
 

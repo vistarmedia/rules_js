@@ -126,10 +126,16 @@ def _js_library_impl(ctx):
   )
 
   # Package all compile-time files into the cjsar
-  compile_type = FileType(ctx.attr.compile_type)
+  compile_srcs = []
+  for src in ctx.files.srcs:
+    for extension in ctx.attr.compile_type:
+      if src.path.endswith(extension):
+        compile_srcs.append(src)
+        break
+
   _build_src_jsar(
     ctx     = ctx,
-    srcs    = compile_type.filter(ctx.files.srcs),
+    srcs    = compile_srcs,
     package = ctx.attr.package,
     output  = cjsar,
   )
@@ -243,7 +249,7 @@ def _js_binary_impl(ctx):
 # ------------------------------------------------------------------------------
 
 jsar_attr = attr.label(
-  default    = Label('@io_bazel_rules_js//js/tools:jsar-bin'),
+  default    = Label('@com_vistarmedia_rules_js//js/tools:jsar-bin'),
   cfg        = 'host',
   executable = True)
 
@@ -261,7 +267,7 @@ jsar = rule(
   _jsar_impl,
   attrs = {
     'tar': attr.label(
-      allow_files = FileType(['.tgz', '.tar.gz']),
+      allow_files = ['.tgz', '.tar.gz'],
       single_file = True,
       mandatory   = True),
 

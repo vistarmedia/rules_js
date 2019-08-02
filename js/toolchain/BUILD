@@ -1,4 +1,4 @@
-load("@io_bazel_rules_js//js:def.bzl", "js_binary")
+load("@com_vistarmedia_rules_js//js:def.bzl", "js_binary")
 
 config_setting(
     name = "k8",

@@ -1,4 +1,4 @@
-load('@io_bazel_rules_js//js/private:rules.bzl', 'js_lib_providers')
+load('@com_vistarmedia_rules_js//js/private:rules.bzl', 'js_lib_providers')
 
 
 def _strict_js_deps(ctx):
@@ -49,12 +49,12 @@ Generate a target that will only be created if the sources of this target:
     'src': attr.label(providers=js_lib_providers),
 
     '_check_strict_deps': attr.label(
-      default = Label('@io_bazel_rules_js//js/tools/check_strict_deps:check_strict_deps'),
+      default = Label('@com_vistarmedia_rules_js//js/tools/check_strict_deps:check_strict_deps'),
       executable = True,
       cfg = 'host'),
 
     '_node':  attr.label(
-      default = Label('@io_bazel_rules_js//js/toolchain:node'),
+      default = Label('@com_vistarmedia_rules_js//js/toolchain:node'),
       cfg = 'host',
       executable = True,
       allow_single_file = True),
@@ -77,12 +77,12 @@ source files:
     'deps': attr.label_list(providers=js_lib_providers),
 
     '_check_strict_deps': attr.label(
-      default = Label('@io_bazel_rules_js//js/tools/check_strict_deps:check_strict_deps'),
+      default = Label('@com_vistarmedia_rules_js//js/tools/check_strict_deps:check_strict_deps'),
       executable = True,
       cfg = 'host'),
 
     '_node':  attr.label(
-      default = Label('@io_bazel_rules_js//js/toolchain:node'),
+      default = Label('@com_vistarmedia_rules_js//js/toolchain:node'),
       cfg = 'host',
       executable = True,
       allow_single_file = True),

@@ -1,4 +1,4 @@
-load('@io_bazel_rules_js//js/private:rules.bzl', 'js_binary')
+load('@com_vistarmedia_rules_js//js/private:rules.bzl', 'js_binary')
 
 
 def _mocha_test_impl(ctx):
@@ -35,13 +35,13 @@ _mocha_test = rule(
   _mocha_test_impl,
   test = True,
   attrs = {
-    # See cfg note in @io_bazel_rules_js//:README.md
+    # See cfg note in @com_vistarmedia_rules_js//:README.md
     'tests':    attr.label_list(allow_files=True, cfg='target'),
     'requires': attr.label_list(allow_files=True),
     'data':     attr.label_list(),
     'reporter': attr.label(),
 
-    # See cfg note in @io_bazel_rules_js//:README.md
+    # See cfg note in @com_vistarmedia_rules_js//:README.md
     'driver':   attr.label(executable=True, cfg='target'),
   },
 )
@@ -58,7 +58,7 @@ def mocha_test(name, deps, srcs, reporter=None, **kwargs):
   js_binary(
     name     = name + '.driver',
     testonly = True,
-    src      = '@io_bazel_rules_js//js/tools:mocha.js',
+    src      = '@com_vistarmedia_rules_js//js/tools:mocha.js',
     deps     = all_deps,
   )
 

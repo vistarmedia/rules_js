@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { promisify } = require("util");
 
-const { unbundle } = require("io_bazel_rules_js/js/tools/jsar/jsar");
+const { unbundle } = require("com_vistarmedia_rules_js/js/tools/jsar/jsar");
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);

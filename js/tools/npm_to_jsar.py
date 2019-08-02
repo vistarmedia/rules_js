@@ -17,7 +17,7 @@ parser.add_argument('--visibility', nargs='*', default=None)
 
 
 _BUILDFILE = string.Template("""
-load('@io_bazel_rules_js//js/private:rules.bzl', 'jsar')
+load('@com_vistarmedia_rules_js//js/private:rules.bzl', 'jsar')
 ${dep_infos}
 jsar(
   name = 'lib',

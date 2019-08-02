@@ -1,4 +1,4 @@
-load('@io_bazel_rules_js//js/private:rules.bzl',
+load('@com_vistarmedia_rules_js//js/private:rules.bzl',
   'js_binary',
   'node_attr')
 
@@ -62,7 +62,7 @@ _browserify = rule(
   attrs = {
     'entrypoint': attr.label(providers=['main']),
 
-    # See cfg note in @io_bazel_rules_js//:README.md
+    # See cfg note in @com_vistarmedia_rules_js//:README.md
     'bundler': attr.label(
       executable = True,
       providers = ['main'],
@@ -91,9 +91,9 @@ _uglify = rule(
     'mangle': attr.bool(default=True, mandatory=False),
     'src':  attr.label(single_file=True),
 
-    # See cfg note in @io_bazel_rules_js//:README.md
+    # See cfg note in @com_vistarmedia_rules_js//:README.md
     '_uglify': attr.label(
-      default = Label('@io_bazel_rules_js//js/toolchain:uglify'),
+      default = Label('@com_vistarmedia_rules_js//js/toolchain:uglify'),
       executable = True,
       cfg = 'target'),
 
@@ -116,7 +116,7 @@ def js_bundle(name, bin, minified=False, **kwargs):
 
   js_binary(
     name = bundler,
-    src  = '@io_bazel_rules_js//js/toolchain:browserify.js',
+    src  = '@com_vistarmedia_rules_js//js/toolchain:browserify.js',
     deps = [bin] + [
       '@browserify//:lib',
       '@loose.envify//:lib',

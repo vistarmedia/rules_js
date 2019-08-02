@@ -1,5 +1,5 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary")
-load("@io_bazel_rules_js//js:def.bzl", "js_binary", "js_library")
+load("@com_vistarmedia_rules_js//js:def.bzl", "js_binary", "js_library")
 
 go_binary(
     name = "jsar-bin",
@@ -7,7 +7,7 @@ go_binary(
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_pkg_errors//:go_default_library",
-        "@io_bazel_rules_js//js/tools/jsar:go_default_library",
+        "@com_vistarmedia_rules_js//js/tools/jsar:go_default_library",
     ],
 )
 
