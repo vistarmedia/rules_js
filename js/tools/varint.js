@@ -15,6 +15,18 @@ function readUnsignedVarint32(a, offset) {
   return { value: result, length: intOffset };
 }
 
+function writeUnsignedVarint32(buf, value) {
+  let i = 0;
+  while(value >= 0x80) {
+    buf[i] = value | 0x80;
+    value >>= 7;
+    i++;
+  }
+  buf[i] = value;
+  return i + 1;
+}
+
 module.exports = {
-  readUnsignedVarint32
+  readUnsignedVarint32,
+  writeUnsignedVarint32,
 };
