@@ -44,6 +44,8 @@ def _create_workspace(ctx, tarballs):
   ignore_deps = list(ctx.attr.ignore_deps)
   ignore_deps.append(ctx.attr.package)
 
+  visibility = list(ctx.attr.visibility)
+
   ctx.file('WORKSPACE', "workspace(name='%s')\n" % ctx.name, False)
 
   npm_tars = []
@@ -65,6 +67,10 @@ def _create_workspace(ctx, tarballs):
   cmd += ['--npm_tar'] + npm_tars
   if ignore_deps:
     cmd += ['--ignore_deps'] + ignore_deps
+
+  if visibility:
+    visibility_strings = ['@' + str(target) for target in visibility]
+    cmd += ['--visibility'] + visibility_strings
 
   if ctx.attr.ignore_paths:
     cmd += ['--ignore_paths'] + ctx.attr.ignore_paths

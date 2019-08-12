@@ -13,6 +13,7 @@ parser.add_argument('--rename')
 parser.add_argument('--npm_tar', nargs='+')
 parser.add_argument('--ignore_deps', nargs='*')
 parser.add_argument('--ignore_paths', nargs='*', default=[])
+parser.add_argument('--visibility', nargs='*', default=None)
 
 
 _BUILDFILE = string.Template("""
@@ -137,7 +138,7 @@ def _write_buildfile(filename, deps, js_tar_name, ignore_deps,
 
 
 def _main(
-  buildfile, js_tar_name, npm_tar_names, ignore_deps, ignore_paths, rename):
+  buildfile, js_tar_name, npm_tar_names, ignore_deps, ignore_paths, rename, visibility):
 
   js_tar = tarfile.open(js_tar_name, 'w:gz')
   deps   = {}
@@ -146,7 +147,7 @@ def _main(
     with tarfile.open(npm_tar_name) as npm_tar:
       deps.update(_copy_tar_files(npm_tar, js_tar, ignore_paths, rename))
 
-  _write_buildfile(buildfile, deps, js_tar_name, ignore_deps)
+  _write_buildfile(buildfile, deps, js_tar_name, ignore_deps, visibility)
 
 
 def _parse_args(args):
@@ -172,12 +173,13 @@ def main(args):
     rename = {parts[0]: parts[1]}
 
   _main(
-    buildfile      = params.buildfile,
-    js_tar_name    = params.output,
-    npm_tar_names  = params.npm_tar,
-    ignore_deps    = params.ignore_deps,
-    ignore_paths   = params.ignore_paths,
-    rename         = rename,
+    buildfile     = params.buildfile,
+    js_tar_name   = params.output,
+    npm_tar_names = params.npm_tar,
+    ignore_deps   = params.ignore_deps,
+    ignore_paths  = params.ignore_paths,
+    rename        = rename,
+    visibility    = params.visibility
   )
 
   return 0
