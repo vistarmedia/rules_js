@@ -41,8 +41,8 @@ describe('jsarWriter', () => {
     const fname = path.join(process.env.TEST_TMPDIR, 'test.jsar');
 
     const file = await open(fname, 'w');
-    await write(file, await bundle('/etc/passwd', 'Nice programmings'));
-    await write(file, await bundle('/etc/shadow', 'Hat town'));
+    await write(file, bundle('/etc/passwd', 'Nice programmings'));
+    await write(file, bundle('/etc/shadow', 'Hat town'));
     await close(file);
 
     const jsar = await unbundle(await readFile(fname));

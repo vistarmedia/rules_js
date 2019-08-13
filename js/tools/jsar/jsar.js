@@ -1,10 +1,7 @@
-const zlib        = require('zlib')
-const {promisify} = require('util')
+const zlib = require('zlib')
 
 const {readUnsignedVarint32} = require('../varint');
 const {writeUnsignedVarint32} = require('../varint');
-
-const gzip = promisify(zlib.gzip);
 
 /**
  * Unbundles a jsar buffer and returns the files in memory
@@ -44,7 +41,7 @@ function unbundle(buffer) {
 }
 
 
-async function bundle(fileName, contents) {
+function bundle(fileName, contents) {
   const header = JSON.stringify({
     n: fileName,
     s: contents.length,
@@ -60,7 +57,7 @@ async function bundle(fileName, contents) {
     Buffer.from(contents),
   ]);
 
-  return await gzip(payload);
+  return zlib.gzipSync(payload);
 }
 
 
