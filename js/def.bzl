@@ -10,3 +10,5 @@ load('//js/private:rules.bzl',
   'js_library',
   'js_binary',
   'jsar')
+
+load('//js/private:strict_js_deps.bzl', 'strict_js_deps')

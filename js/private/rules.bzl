@@ -1,4 +1,4 @@
-js_lib_providers = ['jsar', 'runtime_deps', 'compile_deps']
+js_lib_providers = ['jsar', 'runtime_deps', 'compile_deps', 'direct_cdeps']
 js_bin_providers = ['jsar', 'runtime_deps']
 
 
@@ -50,6 +50,7 @@ def _jsar_impl(ctx):
 
     runtime_deps = runtime_deps(ctx.attr.deps),
     compile_deps = compile_deps(ctx.attr.deps),
+    direct_cdeps = [dep.cjsar for dep in ctx.attr.deps],
   )
 
 def _jsar_path(src, package):
@@ -145,6 +146,7 @@ def _js_library_impl(ctx):
 
     runtime_deps = runtime_deps(ctx.attr.deps),
     compile_deps = compile_deps(ctx.attr.deps),
+    direct_cdeps = [dep.cjsar for dep in ctx.attr.deps],
   )
 
 
