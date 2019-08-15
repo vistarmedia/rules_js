@@ -89,7 +89,7 @@ _uglify = rule(
   attrs = {
     'compress': attr.bool(default=True, mandatory=False),
     'mangle': attr.bool(default=True, mandatory=False),
-    'src':  attr.label(single_file=True),
+    'src':  attr.label(allow_single_file=True),
 
     # See cfg note in @com_vistarmedia_rules_js//:README.md
     '_uglify': attr.label(

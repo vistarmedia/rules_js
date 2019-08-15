@@ -267,9 +267,8 @@ jsar = rule(
   _jsar_impl,
   attrs = {
     'tar': attr.label(
-      allow_files = ['.tgz', '.tar.gz'],
-      single_file = True,
-      mandatory   = True),
+      allow_single_file = ['.tgz', '.tar.gz'],
+      mandatory = True),
 
     'deps':  js_lib_attr,
     '_jsar': jsar_attr,
@@ -310,7 +309,7 @@ js_binary = rule(
   _js_binary_impl,
   executable = True,
   attrs = {
-    'src':  attr.label(allow_files=True, single_file=True),
+    'src':  attr.label(allow_single_file=True),
     'deps': js_bin_attr,
     'data':    attr.label_list(allow_files=True,
       doc = 'Files visible to this bin at runtime'),

@@ -168,13 +168,13 @@ attrs = {
 
 _npm_install = repository_rule(
   _npm_install_impl,
-  attrs = attrs + {'version': attr.string()},
+  attrs = dict(attrs, version = attr.string()),
 )
 
 
 _npm_tarball_install = repository_rule(
   _npm_tarball_install_impl,
-  attrs = attrs + {'url': attr.string(mandatory=True)},
+  attrs = dict(attrs, url = attr.string(mandatory=True)),
 )
 
 def npm_install(name, **kwargs):
