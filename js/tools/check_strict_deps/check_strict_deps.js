@@ -30,10 +30,11 @@ async function getFileImports(src) {
     return moduleProxy;
   };
 
-  new Function("require", "module", "window", src)(
+  new Function("require", "module", "window", "describe", src)(
     captureImport, // require
     moduleProxy, // module
-    moduleProxy // window
+    moduleProxy, // window
+    moduleProxy // describe, for mocha tests
   );
 
   return imports;
@@ -85,6 +86,14 @@ function resolve(file, literalImpt, deps) {
   );
 }
 
+async function readSources(srcPaths) {
+  let sources = {};
+  for (let srcPath of srcPaths) {
+    sources[srcPath] = (await readFile(srcPath)).toString();
+  }
+  return sources;
+}
+
 async function main(paths) {
   // Step 1: Read all our deps
   let deps = {};
@@ -96,8 +105,12 @@ async function main(paths) {
     };
   }
 
-  // Step 2: Figure out all our imports
-  const imports = await getImports(await unbundle(await readFile(paths.src)));
+  // Step 2: Figure out all our imports. Then can either be given to us by a
+  // `src_jsar` path parameter, or a list in of `srcs` paths.
+  const srcFiles = paths.src_jsar
+    ? unbundle(await readFile(paths.src_jsar))
+    : readSources(paths.srcs);
+  const imports = await getImports(await srcFiles);
 
   // Step 3: Resolve the imports against the deps
   for (let importer of imports) {

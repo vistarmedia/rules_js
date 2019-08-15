@@ -11,4 +11,4 @@ load('//js/private:rules.bzl',
   'js_binary',
   'jsar')
 
-load('//js/private:strict_js_deps.bzl', 'strict_js_deps')
+load('//js/private:strict_js_deps.bzl', 'strict_js_deps', 'strict_js_src_deps')
