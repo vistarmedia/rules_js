@@ -6,19 +6,19 @@ def runtime_deps(deps):
   """
   Set of transitive jsar files needed to run this target
   """
-  jsars = depset()
-  for dep in deps:
-    jsars += dep.runtime_deps.union([dep.jsar])
-  return jsars
+  return depset(
+    direct=[dep.jsar for dep in deps],
+    transitive=[dep.runtime_deps for dep in deps],
+  )
 
 def compile_deps(deps):
   """
   Set of transitive jsar files needed to compile this target
   """
-  cjsars = depset()
-  for dep in deps:
-    cjsars += dep.compile_deps.union([dep.cjsar])
-  return cjsars
+  return depset(
+    direct=[dep.cjsar for dep in deps],
+    transitive=[dep.compile_deps for dep in deps],
+  )
 
 
 def _jsar_impl(ctx):
@@ -83,15 +83,14 @@ def _build_src_jsar(ctx, srcs, package, output):
 
 
 def _build_dep_jsar(ctx, deps, output):
-  command = ' '.join(
-    ['cat'] + [dep.path for dep in deps] + \
-    ['>', output.path]
-  )
+  args = ctx.actions.args()
+  args.add_all(deps)
 
-  ctx.action(
-    command    = command,
-    inputs     = list(deps),
+  ctx.actions.run_shell(
+    command    = "cat $@ > '%s'" % output.path,
+    inputs     = deps,
     outputs    = [output],
+    arguments  = [args],
     mnemonic   = 'PackageDepJsar',
   )
 
@@ -110,7 +109,7 @@ def build_jsar(ctx, files, package, jsars, output):
     output  = ctx.new_file(ctx.label.name +'.srcJsar'),
   )
 
-  return _build_dep_jsar(ctx, jsars + [src_jsar], output)
+  return _build_dep_jsar(ctx, depset([src_jsar], transitive=[jsars]), output)
 
 
 def _js_library_impl(ctx):
