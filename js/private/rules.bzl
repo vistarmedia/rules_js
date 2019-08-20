@@ -21,6 +21,21 @@ def compile_deps(deps):
   )
 
 
+def _raw_jsar_impl(ctx):
+  """
+  Creates a js_library target from a raw jsar file
+  """
+  return struct(
+    files   = depset(ctx.files.srcs),
+    jsar    = ctx.file.srcs,
+    cjsar   = ctx.file.srcs,
+    ts_defs = depset(),
+
+    runtime_deps = runtime_deps(ctx.attr.deps),
+    compile_deps = compile_deps(ctx.attr.deps),
+    direct_cdeps = [dep.cjsar for dep in ctx.attr.deps],
+  )
+
 def _jsar_impl(ctx):
   """
   Creates a raw js_library from a tarball. The resulting target will have the
@@ -270,6 +285,17 @@ jsar = rule(
   },
   outputs = {
     'jsar': '%{name}.jsar',
+  },
+)
+
+raw_jsar = rule(
+  _raw_jsar_impl,
+  attrs = {
+    'srcs': attr.label(
+      allow_single_file = ['.jsar'],
+      mandatory = True),
+
+    'deps':  js_lib_attr,
   },
 )
 
