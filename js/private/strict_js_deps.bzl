@@ -2,7 +2,7 @@ load('@com_vistarmedia_rules_js//js/private:rules.bzl', 'js_lib_providers')
 
 
 def _strict_js_deps(ctx):
-  inputs = ctx.attr.src.direct_cdeps + [ctx.attr.src.jsar, ctx.executable._node]
+  inputs = ctx.attr.src.direct_cdeps + [ctx.attr.src.jsar]
 
   paths = struct(
     src_jsar = ctx.attr.src.jsar.path,
@@ -13,6 +13,7 @@ def _strict_js_deps(ctx):
 
   ctx.actions.run(
     inputs = inputs,
+    tools = [ctx.executable._node],
     outputs = [ctx.outputs.ok],
     arguments = [paths.to_json()],
     executable = ctx.executable._check_strict_deps,
@@ -23,7 +24,7 @@ def _strict_js_src_deps(ctx):
   jsars         = [jsar.cjsar  for jsar in ctx.attr.deps]
   ignored_jsars = [jsar.cjsar  for jsar in ctx.attr.ignored_strict_deps]
 
-  inputs = jsars + ctx.files.srcs + [ctx.executable._node]
+  inputs = jsars + ctx.files.srcs
 
   paths = struct(
     srcs = [src.path for src in ctx.files.srcs],
@@ -34,6 +35,7 @@ def _strict_js_src_deps(ctx):
 
   ctx.actions.run(
     inputs = inputs,
+    tools = [ctx.executable._node],
     outputs = [ctx.outputs.ok],
     arguments = [paths.to_json()],
     executable = ctx.executable._check_strict_deps,

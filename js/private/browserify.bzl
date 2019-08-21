@@ -18,18 +18,19 @@ def _browserify_impl(ctx):
   if ctx.attr.source_maps:
     arguments.append('--debug')
 
-  ctx.action(
+  ctx.actions.run(
     executable = ctx.executable.bundler,
     arguments  = arguments,
-    inputs     = ctx.files.bundler + ctx.files._node,
+    inputs     = ctx.files.bundler,
+    tools      = [ctx.executable._node],
     outputs    = [ctx.outputs.js],
     mnemonic   = 'Browserify',
     env        = ctx.attr.env,
   )
 
-  return struct(
+  return [DefaultInfo(
     files = depset([ctx.outputs.js]),
-  )
+  )]
 
 
 def _uglify_impl(ctx):
@@ -43,17 +44,18 @@ def _uglify_impl(ctx):
   if ctx.attr.mangle:
     arguments.append('--mangle')
 
-  ctx.action(
+  ctx.actions.run(
     executable = ctx.executable._uglify,
     arguments  = arguments,
-    inputs     = ctx.files.src + ctx.files._node,
+    inputs     = ctx.files.src,
+    tools      = [ctx.executable._node],
     outputs    = [ctx.outputs.js],
     mnemonic   = 'Uglify',
   )
 
-  return struct(
+  return [DefaultInfo(
     files = depset([ctx.outputs.js])
-  )
+  )]
 
 
 _browserify = rule(

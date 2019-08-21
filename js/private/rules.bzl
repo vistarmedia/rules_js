@@ -29,15 +29,14 @@ def _jsar_impl(ctx):
   tar  = ctx.file.tar
   jsar = ctx.outputs.jsar
 
-  arguments = [
-    'fromtarball',
-    '-output', jsar.path,
-    tar.path,
-  ]
+  args = ctx.actions.args()
+  args.add('fromtarball')
+  args.add('-output', jsar)
+  args.add(tar)
 
-  ctx.action(
+  ctx.actions.run(
     executable = ctx.executable._jsar,
-    arguments  = arguments,
+    arguments  = [args],
     inputs     = [tar],
     outputs    = [jsar],
     mnemonic   = 'PackageTarJsar',
@@ -71,10 +70,10 @@ def _build_src_jsar(ctx, srcs, package, output):
     '%s=/%s' % (s.path, _jsar_path(s, package)) for s in srcs
   ]
 
-  ctx.action(
+  ctx.actions.run(
     executable = ctx.executable._jsar,
     arguments  = arguments,
-    inputs     = list(srcs),
+    inputs     = srcs,
     outputs    = [output],
     mnemonic   = 'PackageSrcJsar',
   )
@@ -83,14 +82,11 @@ def _build_src_jsar(ctx, srcs, package, output):
 
 
 def _build_dep_jsar(ctx, deps, output):
-  args = ctx.actions.args()
-  args.add_all(deps)
-
   ctx.actions.run_shell(
     command    = "cat $@ > '%s'" % output.path,
     inputs     = deps,
     outputs    = [output],
-    arguments  = [args],
+    arguments  = [ctx.actions.args().add_all(deps)],
     mnemonic   = 'PackageDepJsar',
   )
 
@@ -106,7 +102,7 @@ def build_jsar(ctx, files, package, jsars, output):
     ctx     = ctx,
     srcs    = files,
     package = package,
-    output  = ctx.new_file(ctx.label.name +'.srcJsar'),
+    output  = ctx.actions.declare_file(ctx.label.name +'.srcJsar'),
   )
 
   return _build_dep_jsar(ctx, depset([src_jsar], transitive=[jsars]), output)
@@ -203,10 +199,10 @@ def node_driver(ctx, output, jsar, node, random_libdir, cmd, arguments=[]):
     ),
   ]
 
-  ctx.file_action(
-    output     = output,
-    content    = '\n'.join(content),
-    executable = True,
+  ctx.actions.write(
+    output        = output,
+    content       = '\n'.join(content),
+    is_executable = True,
   )
 
 
