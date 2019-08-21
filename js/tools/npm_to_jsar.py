@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+
+# Even those this script is run as a cfg='host', its not wrapped in a py_binary,
+# and it doesnt seem straightforward to use a py_binary in a repository_ctx. As
+# a result, this *will not* use the python toolchains setup by bazel, instead it
+# will use whatever `python` is on your PATH. However, this script works with
+# both PY2 and PY3 so it shouldn't matter what python points to.
 import argparse
 import json
 import os
