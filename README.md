@@ -105,34 +105,4 @@ then remove `./node_modules`.
 External dependencies created with `npm_install` will use a behind-the-scenes
 rule, `jsar` to directly create the tarfile containing the sources with working
 directly with `js_library`. These targets will have _all_ files included as
-compile-time deps
-
-## A word about Bazel configurations
-Bazel has a concept called
-[configurations](https://docs.bazel.build/versions/master/skylark/rules.html#configurations).
-This makes far more sense when considering native compilations like C++, but
-unfortunately Bazel doesn't know it doesn't matter for JavaScript. (or we're not
-good enough to program around it).
-
-The two primary ones are "target" and "host". If you run `bazel build ...`,
-Bazel will build "target" configurations -- ie: Artifacts for the platform where
-the code will be running. However, if you need an artifact that will run locally
-like a compiler or code-generator, that artifact must be compiled for "host."
-
-So, while building JS artifacts, you're creating many "target" artifacts.
-However, when running tests (or browserify, etc), an odd thing happens.
-
-* We want a `js_binary` that can resolve Mocha dependencies *and* resolve
-  whatever libraries we're passing to it for testing
-* This rule, logically, should have an attribute for Mocha with `cfg = "host"`,
-  as it'll be running locally.
-* Bazel infers that the dependencies will also need to be compiled for the
-  "host", but everything on disk is compiled for "target"
-* Bazel will now recompile all the `js_libraries` with a "host" configuration
-
-When doing `bazel test ...`, this _would_ first compile all libraries to the
-target configuration, then build them _again_ for the host (indicating it with
-the suffix `[for host]` on the build status).
-
-We circumvent this by specifically indicating that we want "target" binaries in
-our higher-order binary rules. It looks wrong. But that's why.
+compile-time deps.

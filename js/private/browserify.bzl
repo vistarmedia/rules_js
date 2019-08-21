@@ -64,11 +64,10 @@ _browserify = rule(
   attrs = {
     'entrypoint': attr.label(providers=['main']),
 
-    # See cfg note in @com_vistarmedia_rules_js//:README.md
     'bundler': attr.label(
       executable = True,
       providers = ['main'],
-      cfg = 'target'),
+      cfg = 'host'),
 
     'env': attr.string_dict(default={}),
 
@@ -93,11 +92,10 @@ _uglify = rule(
     'mangle': attr.bool(default=True, mandatory=False),
     'src':  attr.label(allow_single_file=True),
 
-    # See cfg note in @com_vistarmedia_rules_js//:README.md
     '_uglify': attr.label(
       default = Label('@com_vistarmedia_rules_js//js/toolchain:uglify'),
       executable = True,
-      cfg = 'target'),
+      cfg = 'host'),
 
     '_node': node_attr,
   },

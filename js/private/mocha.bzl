@@ -35,14 +35,11 @@ _mocha_test = rule(
   _mocha_test_impl,
   test = True,
   attrs = {
-    # See cfg note in @com_vistarmedia_rules_js//:README.md
-    'tests':    attr.label_list(allow_files=True, cfg='target'),
+    'tests':    attr.label_list(allow_files=True),
     'requires': attr.label_list(allow_files=True),
     'data':     attr.label_list(),
     'reporter': attr.label(),
-
-    # See cfg note in @com_vistarmedia_rules_js//:README.md
-    'driver':   attr.label(executable=True, cfg='target'),
+    'driver':   attr.label(executable=True, cfg='host'),
   },
 )
 

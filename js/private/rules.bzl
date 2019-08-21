@@ -254,8 +254,8 @@ node_attr = attr.label(
   executable  = True,
   allow_files = True)
 
-js_lib_attr = attr.label_list(providers=js_lib_providers, cfg='target')
-js_bin_attr = attr.label_list(providers=js_bin_providers, cfg='target')
+js_lib_attr = attr.label_list(providers=js_lib_providers)
+js_bin_attr = attr.label_list(providers=js_bin_providers)
 
 
 jsar = rule(
