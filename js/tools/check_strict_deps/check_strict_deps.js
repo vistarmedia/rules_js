@@ -11,8 +11,15 @@ const writeFile = promisify(fs.writeFile);
  * dependency tree. This value will return itself for every property called.
  * This could potentially yield bad results if there is a programatic require
  * statement.
+ *
+ * The `_inner` value needs to be a function so code calling `new {import}()`
+ * will execute.
  */
-const moduleProxy = new Proxy(() => {}, {
+function _inner() {}
+const moduleProxy = new Proxy(_inner, {
+  construct(target, args) {
+    return moduleProxy;
+  },
   get(target, name, receiver) {
     return moduleProxy;
   },
