@@ -8,6 +8,7 @@ def _strict_js_deps(ctx):
     src_jsar = ctx.attr.src.jsar.path,
     output = ctx.outputs.ok.path,
     deps = [dep.path for dep in ctx.attr.src.direct_cdeps],
+    ignored_deps = [],
   )
 
   ctx.actions.run(
@@ -19,7 +20,8 @@ def _strict_js_deps(ctx):
   )
 
 def _strict_js_src_deps(ctx):
-  jsars = [jsar.cjsar  for jsar in ctx.attr.deps]
+  jsars         = [jsar.cjsar  for jsar in ctx.attr.deps]
+  ignored_jsars = [jsar.cjsar  for jsar in ctx.attr.ignored_strict_deps]
 
   inputs = jsars + ctx.files.srcs + [ctx.executable._node]
 
@@ -27,6 +29,7 @@ def _strict_js_src_deps(ctx):
     srcs = [src.path for src in ctx.files.srcs],
     output = ctx.outputs.ok.path,
     deps = [jsar.path for jsar in jsars],
+    ignored_deps = [jsar.path for jsar in ignored_jsars]
   )
 
   ctx.actions.run(
@@ -75,6 +78,7 @@ source files:
   attrs = {
     'srcs': attr.label_list(allow_files=True),
     'deps': attr.label_list(providers=js_lib_providers),
+    'ignored_strict_deps': attr.label_list(providers=js_lib_providers),
 
     '_check_strict_deps': attr.label(
       default = Label('@com_vistarmedia_rules_js//js/tools/check_strict_deps:check_strict_deps'),

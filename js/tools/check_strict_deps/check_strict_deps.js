@@ -120,6 +120,10 @@ async function main(paths) {
   }
 
   for (let jsar in deps) {
+    if (paths.ignored_deps.indexOf(jsar) >= 0) {
+      continue;
+    }
+
     const { imported_by } = deps[jsar];
     if (imported_by.length == 0) {
       throw Error(`${jsar} declared as dep, but not used`);
