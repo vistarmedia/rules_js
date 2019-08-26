@@ -22,6 +22,13 @@ def js_repositories():
         build_file_content = _node_buildfile("darwin-x64"),
     )
 
+    # Meriyah parses JS to find dependencies
+    npm_install(
+        name = "meriyah",
+        version = "1.6.10",
+        sha256 = "f44b1eebc09c3d8e4c56f43e4993fd2e61d505c190a126209bb077687f3a824c",
+    )
+
     # Grab Mocha + dependencies
     npm_install(
         name = "graceful-readlink",
