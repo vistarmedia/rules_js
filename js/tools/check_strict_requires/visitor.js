@@ -175,6 +175,7 @@ function visit(ast, scope) {
       visit(ast.argument, scope);
       break;
 
+    case "BreakStatement":
     case "Literal":
     case "ThisExpression":
       break;

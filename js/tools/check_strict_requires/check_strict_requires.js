@@ -24,21 +24,28 @@ async function checkFile(fileName, src) {
   const scope = new Scope(undefined, logger);
   scope.declareGlobals([
     "Array",
+    "Blob",
     "Date",
+    "FileReader",
+    "JSON",
+    "Math",
+    "Number",
     "Object",
+    "Promise",
     "RegExp",
+    "arguments",
+    "console",
     "document",
+    "ga", // TODO: Should be acquired from window
+    "history", // TODO: Should be acquired from window
+    "isNaN",
     "location",
     "module",
+    "parseFloat",
+    "parseInt",
     "process",
     "require",
     "window",
-    "Number",
-    "Math",
-    "Promise",
-    "console",
-    "parseFloat",
-    "arguments",
 
     // test globals
     "it",
