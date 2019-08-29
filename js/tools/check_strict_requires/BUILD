@@ -1,8 +1,8 @@
 load("@com_vistarmedia_rules_js//js:def.bzl", "js_binary", "js_library", "js_test", "strict_js_deps")
 
-js_binary(
+js_library(
     name = "check_strict_requires",
-    src = "check_strict_requires.js",
+    srcs = ["check_strict_requires.js"],
     visibility = ["//visibility:public"],
     deps = [
         ":lib",

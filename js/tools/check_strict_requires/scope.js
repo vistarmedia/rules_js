@@ -21,7 +21,7 @@ class Identifier {
   }
 }
 
-IGNORED_UNUSED_VARIABLES = ["_"];
+IGNORED_UNUSED_VARIABLES = ["_", "__"];
 
 class Scope {
   constructor(parent, logger, depth = 0) {

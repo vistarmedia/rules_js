@@ -2,6 +2,9 @@ const fs = require("fs");
 const { promisify } = require("util");
 
 const { unbundle } = require("com_vistarmedia_rules_js/js/tools/jsar/jsar");
+const {
+  checkStrictRequires
+} = require("com_vistarmedia_rules_js/js/tools/check_strict_requires/check_strict_requires");
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -58,6 +61,8 @@ async function getImports(jsar) {
   return imports;
 }
 
+const colorRed = str => `\x1b[31m${str}\x1b[0m`;
+
 function resolve(file, literalImpt, deps) {
   // Don't look at relative imports
   if (literalImpt.startsWith(".")) {
@@ -88,7 +93,7 @@ function resolve(file, literalImpt, deps) {
   }
 
   throw Error(
-    `File '${file}' imports "${literalImpt}" which could not be ` +
+    `File '${file}' imports "${colorRed(literalImpt)}" which could not be ` +
       `resolved as a direct dependency`
   );
 }
@@ -133,9 +138,11 @@ async function main(paths) {
 
     const { imported_by } = deps[jsar];
     if (imported_by.length == 0) {
-      throw Error(`${jsar} declared as dep, but not used`);
+      throw Error(`${colorRed(jsar)} declared as dep, but not used`);
     }
   }
+
+  await checkStrictRequires(paths);
 
   // Everything checks out! Write the dep/import datastructure to the "ok" file
   await writeFile(paths.output, JSON.stringify(deps, null, 2));

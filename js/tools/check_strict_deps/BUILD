@@ -5,6 +5,7 @@ js_binary(
     src = "check_strict_deps.js",
     visibility = ["//visibility:public"],
     deps = [
+        "@com_vistarmedia_rules_js//js/tools/check_strict_requires",
         "@com_vistarmedia_rules_js//js/tools/jsar",
     ],
 )

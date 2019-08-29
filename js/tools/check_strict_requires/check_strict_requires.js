@@ -24,6 +24,7 @@ async function checkFile(fileName, src) {
   const scope = new Scope(undefined, logger);
   scope.declareGlobals([
     "Array",
+    "Date",
     "Object",
     "RegExp",
     "document",
@@ -77,7 +78,6 @@ async function main(paths) {
   await writeFile(paths.output, "ok");
 }
 
-main(JSON.parse(process.argv[2])).catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+module.exports = {
+  checkStrictRequires: main
+};
