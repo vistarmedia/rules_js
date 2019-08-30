@@ -33,7 +33,6 @@ async function checkFile(fileName, src) {
     "Object",
     "Promise",
     "RegExp",
-    "arguments",
     "console",
     "document",
     "ga", // TODO: Should be acquired from window

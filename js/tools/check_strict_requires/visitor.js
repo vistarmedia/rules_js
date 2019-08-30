@@ -37,6 +37,7 @@ function visit(ast, scope) {
 
     case "FunctionExpression":
       scope.child(child => {
+        child.declareGlobals(["arguments"]);
         ast.params.forEach(param => {
           child.declare(param.name, param.loc);
         });
@@ -125,6 +126,7 @@ function visit(ast, scope) {
     case "FunctionDeclaration":
       scope.declare(ast.id.name, ast.loc);
       scope.child(child => {
+        child.declareGlobals(["arguments"]);
         ast.params.forEach(param => child.declare(param.name, param.loc));
         visit(ast.body, child);
       });

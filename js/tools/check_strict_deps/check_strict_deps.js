@@ -107,7 +107,10 @@ async function readSources(srcPaths) {
 }
 
 async function main(paths) {
-  // Step 1: Read all our deps
+  // Step 1: Check that required imports are used
+  await checkStrictRequires(paths);
+
+  // Step 2: Read all our deps
   let deps = {};
   for (let depName of paths.deps) {
     const dep = await unbundle(await readFile(depName));
@@ -117,14 +120,14 @@ async function main(paths) {
     };
   }
 
-  // Step 2: Figure out all our imports. Then can either be given to us by a
+  // Step 3: Figure out all our imports. Then can either be given to us by a
   // `src_jsar` path parameter, or a list in of `srcs` paths.
   const srcFiles = paths.src_jsar
     ? unbundle(await readFile(paths.src_jsar))
     : readSources(paths.srcs);
   const imports = await getImports(await srcFiles);
 
-  // Step 3: Resolve the imports against the deps
+  // Step 4: Resolve the imports against the deps
   for (let importer of imports) {
     for (let impt of importer.imports) {
       resolve(importer.file, impt, deps);
@@ -141,8 +144,6 @@ async function main(paths) {
       throw Error(`${colorRed(jsar)} declared as dep, but not used`);
     }
   }
-
-  await checkStrictRequires(paths);
 
   // Everything checks out! Write the dep/import datastructure to the "ok" file
   await writeFile(paths.output, JSON.stringify(deps, null, 2));

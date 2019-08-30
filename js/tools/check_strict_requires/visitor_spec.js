@@ -118,6 +118,35 @@ describe("unused identifier finder", () => {
     });
   });
 
+  context("when `arguments` keyword is used in functions", () => {
+    beforeEach(() => {
+      ast = parseScript(
+        `
+          var myObj = {
+            f: function() { // FunctionExpression
+              console.log(arguments);
+            }
+          }
+
+          function hello(obj) { // FunctionDeclaration
+
+            console.log(arguments);
+            console.log(obj)
+          }
+          hello(myObj);
+        `,
+        { loc: true }
+      );
+    });
+
+    it("should not mark them as warnings", () => {
+      logger.warn = spy();
+      visit(ast, scope);
+      scope.check();
+      expect(logger.warn.callCount).to.equal(0);
+    });
+  });
+
   context("when unused variables exist", () => {
     beforeEach(() => {
       ast = parseScript(
