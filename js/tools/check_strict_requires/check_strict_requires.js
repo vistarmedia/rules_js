@@ -33,9 +33,12 @@ async function checkFile(fileName, src) {
     "process",
     "require",
     "window",
+    "Number",
     "Math",
     "Promise",
     "console",
+    "parseFloat",
+    "arguments",
 
     // test globals
     "it",
