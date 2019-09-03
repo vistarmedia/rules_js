@@ -34,9 +34,11 @@ async function checkFile(fileName, src) {
     "Object",
     "Promise",
     "RegExp",
+    "__dirname",
     "console",
     "document",
     "ga", // TODO: Should be acquired from window
+    "global",
     "history", // TODO: Should be acquired from window
     "isNaN",
     "location",

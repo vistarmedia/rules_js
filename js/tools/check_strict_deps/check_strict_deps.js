@@ -40,11 +40,18 @@ async function getFileImports(src) {
     return moduleProxy;
   };
 
-  new Function("require", "module", "window", "describe", src)(
+  const proxiedKeywords = [
+    "afterEach",
+    "beforeEach",
+    "describe",
+    "module",
+    "window"
+  ];
+  const proxies = new Array(proxiedKeywords.length).fill(moduleProxy);
+
+  new Function("require", ...proxiedKeywords, src)(
     captureImport, // require
-    moduleProxy, // module
-    moduleProxy, // window
-    moduleProxy // describe, for mocha tests
+    ...proxies
   );
 
   return imports;

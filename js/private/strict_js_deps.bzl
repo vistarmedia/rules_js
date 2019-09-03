@@ -1,34 +1,19 @@
 load("@com_vistarmedia_rules_js//js/private:rules.bzl", "js_lib_providers")
 
-def _strict_js_deps(ctx):
-    inputs = ctx.attr.src.direct_cdeps + [ctx.attr.src.jsar]
-
-    paths = struct(
-        src_jsar = ctx.attr.src.jsar.path,
-        output = ctx.outputs.ok.path,
-        deps = [dep.path for dep in ctx.attr.src.direct_cdeps],
-        ignored_deps = [],
-    )
-
-    ctx.actions.run(
-        inputs = inputs,
-        tools = [ctx.executable._node],
-        outputs = [ctx.outputs.ok],
-        arguments = [paths.to_json()],
-        executable = ctx.executable._check_strict_deps,
-        mnemonic = "StrictJsDeps",
-    )
-
-def _strict_js_src_deps(ctx):
-    jsars = [jsar.cjsar for jsar in ctx.attr.deps]
+def _strict_deps_target(ctx, srcs, src_jsar, dep_jsars):
+    inputs = dep_jsars + srcs
     ignored_jsars = [jsar.cjsar for jsar in ctx.attr.ignored_strict_deps]
+    src_jsar_path = None
 
-    inputs = jsars + ctx.files.srcs
+    if src_jsar:
+        inputs = inputs + [src_jsar]
+        src_jsar_path = src_jsar.path
 
     paths = struct(
-        srcs = [src.path for src in ctx.files.srcs],
+        src_jsar = src_jsar_path,
+        srcs = [src.path for src in srcs],
         output = ctx.outputs.ok.path,
-        deps = [jsar.path for jsar in jsars],
+        deps = [dep.path for dep in dep_jsars],
         ignored_deps = [jsar.path for jsar in ignored_jsars],
     )
 
@@ -41,16 +26,19 @@ def _strict_js_src_deps(ctx):
         mnemonic = "StrictJsDeps",
     )
 
+def _strict_js_deps(ctx):
+    deps = ctx.attr.src.direct_cdeps
+    _strict_deps_target(ctx, [], ctx.attr.src.jsar, deps)
+
+def _strict_js_src_deps(ctx):
+    deps = [jsar.cjsar for jsar in ctx.attr.deps]
+    _strict_deps_target(ctx, ctx.files.srcs, None, deps)
+
 strict_js_deps = rule(
     _strict_js_deps,
-    doc = """
-Generate a target that will only be created if the sources of this target:
-  * Only import things declared in its `deps` -- transitive dependencies are not
-    allowed
-  * Declare a "dep" that is not required by any of its source files
-""",
     attrs = {
         "src": attr.label(providers = js_lib_providers),
+        "ignored_strict_deps": attr.label_list(providers = js_lib_providers),
         "_check_strict_deps": attr.label(
             default = Label("@com_vistarmedia_rules_js//js/tools/check_strict_deps:check_strict_deps"),
             executable = True,
@@ -63,6 +51,14 @@ Generate a target that will only be created if the sources of this target:
             allow_single_file = True,
         ),
     },
+    doc = """
+Generate a target from a library[1] that will only be created if the sources
+require exactly their "deps." So:
+  * You can't require something that isn't a dep
+  * You can't have a dep that isn't required
+
+[1] Contrast to sources below
+""",
     outputs = {
         "ok": "%{name}.ok",
     },
@@ -70,12 +66,6 @@ Generate a target that will only be created if the sources of this target:
 
 strict_js_src_deps = rule(
     _strict_js_src_deps,
-    doc = """
-Generate a target that will only be created if the imports defined in the given
-source files:
-      * Only import things from the given `deps`
-      * Don't have any `deps` that aren't used.
-""",
     attrs = {
         "srcs": attr.label_list(allow_files = True),
         "deps": attr.label_list(providers = js_lib_providers),
@@ -92,6 +82,14 @@ source files:
             allow_single_file = True,
         ),
     },
+    doc = """
+Generate a target from source files and a dep list[1] that will only be created
+if the sources require exactly the deps" So:
+  * You can't require something that isn't a dep
+  * You can't have a dep that isn't required
+
+[1] Contrast to libraries above
+""",
     outputs = {
         "ok": "%{name}.ok",
     },
