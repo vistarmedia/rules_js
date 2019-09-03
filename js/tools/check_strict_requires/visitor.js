@@ -178,6 +178,11 @@ function visit(ast, scope) {
       visit(ast.argument, scope);
       break;
 
+    case "WhileStatement":
+      visit(ast.test, scope);
+      visit(ast.body, scope);
+      break;
+
     case "BreakStatement":
     case "Literal":
     case "ThisExpression":
