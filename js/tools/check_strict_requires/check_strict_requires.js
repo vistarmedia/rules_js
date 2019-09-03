@@ -26,6 +26,7 @@ async function checkFile(fileName, src) {
     "Array",
     "Blob",
     "Date",
+    "Error",
     "FileReader",
     "JSON",
     "Math",
@@ -40,6 +41,7 @@ async function checkFile(fileName, src) {
     "isNaN",
     "location",
     "module",
+    "navigator", // TODO: Should be acquired from window
     "parseFloat",
     "parseInt",
     "process",
@@ -47,10 +49,11 @@ async function checkFile(fileName, src) {
     "window",
 
     // test globals
-    "it",
+    "afterEach",
     "beforeEach",
     "context",
-    "describe"
+    "describe",
+    "it"
   ]);
   visit(ast, scope);
   scope.check();

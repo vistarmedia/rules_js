@@ -174,6 +174,7 @@ function visit(ast, scope) {
       break;
 
     case "UnaryExpression":
+    case "ThrowStatement":
       visit(ast.argument, scope);
       break;
 
