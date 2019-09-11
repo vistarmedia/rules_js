@@ -1,1 +1,1 @@
-require('browserify/bin/cmd');
+require("browserify/bin/cmd");

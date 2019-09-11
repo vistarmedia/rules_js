@@ -1,1 +1,1 @@
-require('uglify-js/bin/uglifyjs');
+require("uglify-js/bin/uglifyjs");

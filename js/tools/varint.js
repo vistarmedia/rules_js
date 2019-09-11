@@ -1,4 +1,3 @@
-
 function readUnsignedVarint32(a, offset) {
   let b;
   let result = 0;
@@ -6,7 +5,7 @@ function readUnsignedVarint32(a, offset) {
 
   for (let i = 0; i < 5; i++) {
     b = a[offset + intOffset++];
-    result |= (b & 0x7F) << (7 * i);
+    result |= (b & 0x7f) << (7 * i);
     if (!(b & 0x80)) {
       break;
     }
@@ -17,7 +16,7 @@ function readUnsignedVarint32(a, offset) {
 
 function writeUnsignedVarint32(buf, value) {
   let i = 0;
-  while(value >= 0x80) {
+  while (value >= 0x80) {
     buf[i] = value | 0x80;
     value >>= 7;
     i++;
@@ -28,5 +27,5 @@ function writeUnsignedVarint32(buf, value) {
 
 module.exports = {
   readUnsignedVarint32,
-  writeUnsignedVarint32,
+  writeUnsignedVarint32
 };

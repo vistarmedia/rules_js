@@ -1,29 +1,28 @@
-const protobuf = require('protobufjs');
-const fs = require('fs');
-const util = require('util');
+const protobuf = require("protobufjs");
+const fs = require("fs");
+const util = require("util");
 
-const {readUnsignedVarint32} = require('../varint');
+const { readUnsignedVarint32 } = require("../varint");
 
 const readFile = util.promisify(fs.readFile);
 
-const def     = require('./worker_protocol');
+const def = require("./worker_protocol");
 const builder = protobuf.newBuilder({});
-const type    = builder.import(def).build().blaze.worker;
+const type = builder.import(def).build().blaze.worker;
 
-const {WorkRequest, WorkResponse} = type;
-
+const { WorkRequest, WorkResponse } = type;
 
 // @private
 function readWorkRequests(src, onWork, resolve, reject) {
   let data = null;
   let dataOffset = 0;
 
-  src.on('data', async (chunk) => {
-    if(data === null) {
+  src.on("data", async chunk => {
+    if (data === null) {
       // This is the first chunk of the WorkRequest.
       const size = readUnsignedVarint32(chunk, 0);
       const messageSize = size.value;
-      if(messageSize <= chunk.length - size.length) {
+      if (messageSize <= chunk.length - size.length) {
         data = chunk.slice(size.length, size.length + messageSize);
         dataOffset = data.length;
       } else {
@@ -36,31 +35,32 @@ function readWorkRequests(src, onWork, resolve, reject) {
     }
 
     // Keep reading until we have an entire WorkRequest
-    if(dataOffset < data.length) {
+    if (dataOffset < data.length) {
       return;
     }
 
     const request = WorkRequest.decode(data);
     try {
       await onWork(request);
-    } catch(err) {
+    } catch (err) {
       reject(err);
     }
     data = null;
-  })
+  });
 
-  src.on('end', () => {
+  src.on("end", () => {
     resolve();
   });
 }
 
 // @private
 function writeWorkResponse(out, response) {
-  const {exitCode, output} = response;
+  const { exitCode, output } = response;
   out.write(
-    new WorkResponse({exit_code: exitCode, output: output})
+    new WorkResponse({ exit_code: exitCode, output: output })
       .encodeDelimited()
-      .toBuffer());
+      .toBuffer()
+  );
 }
 
 // @private
@@ -72,45 +72,50 @@ async function readWorkInput(flag, arg) {
  * See documentation for `work` below
  * @private
  */
-async function workUnsafe(fun, flagPrefix="--flagfile=", argv=process.argv) {
-  const args    = argv.slice(2);
-  const input   = process.stdin;
-  const output  = process.stdout;
+async function workUnsafe(
+  fun,
+  flagPrefix = "--flagfile=",
+  argv = process.argv
+) {
+  const args = argv.slice(2);
+  const input = process.stdin;
+  const output = process.stdout;
   const safeFun = async (workInput, inputs) => {
     try {
       return await fun(workInput, inputs);
     } catch (err) {
-      return {exitCode: 1, output: err.stack};
+      return { exitCode: 1, output: err.stack };
     }
-  }
+  };
 
   // Ensure that there's only one argument. Bail if anything else seems to be
   // the case.
-  if(args.length !== 1) {
-    const msg = `${argv[1]} expected exactly 1 argument, ` +
-                `got ${args.length}: ${JSON.stringify(args)}`;
+  if (args.length !== 1) {
+    const msg =
+      `${argv[1]} expected exactly 1 argument, ` +
+      `got ${args.length}: ${JSON.stringify(args)}`;
     throw Error(msg);
   }
   const arg = args[0];
 
   // Running one-shot
-  if(arg.startsWith(flagPrefix)) {
+  if (arg.startsWith(flagPrefix)) {
     const workInput = await readWorkInput(flagPrefix, arg);
-    const {exitCode, output} = await safeFun(workInput, []);
-    if(output) {
+    const { exitCode, output } = await safeFun(workInput, []);
+    if (output) {
       console.log(output);
     }
     process.exit(exitCode);
   }
 
   // Running persistent
-  if(arg === '--persistent_worker') {
-    const onWork = async (request) => {
+  if (arg === "--persistent_worker") {
+    const onWork = async request => {
       const arg = request.arguments[0];
       const workInput = await readWorkInput(flagPrefix, arg);
       writeWorkResponse(output, await safeFun(workInput, request.inputs));
-    }
-    return new Promise((resolve) => {
+    };
+    return new Promise(resolve => {
       readWorkRequests(input, onWork, resolve);
     });
   }
@@ -140,10 +145,10 @@ async function work() {
   try {
     await workUnsafe.apply(null, arguments);
     process.exit(0);
-  } catch(err) {
+  } catch (err) {
     console.error(err.stack);
     process.exit(2);
   }
 }
 
-module.exports = {work};
+module.exports = { work };

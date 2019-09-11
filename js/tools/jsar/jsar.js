@@ -1,7 +1,7 @@
-const zlib = require('zlib')
+const zlib = require("zlib");
 
-const {readUnsignedVarint32} = require('../varint');
-const {writeUnsignedVarint32} = require('../varint');
+const { readUnsignedVarint32 } = require("../varint");
+const { writeUnsignedVarint32 } = require("../varint");
 
 /**
  * Unbundles a jsar buffer and returns the files in memory
@@ -9,42 +9,41 @@ const {writeUnsignedVarint32} = require('../varint');
  * @returns {Object} A mapping of file name to file contents
  */
 function unbundle(buffer) {
-  return new Promise(function(resolve, reject){
+  return new Promise(function(resolve, reject) {
     zlib.unzip(buffer, (error, buffer) => {
       if (error) {
-        reject(error)
-        return
+        reject(error);
+        return;
       }
-      let offset = 0
-      const packages = {}
+      let offset = 0;
+      const packages = {};
       while (offset < buffer.length) {
         try {
-          const length = readUnsignedVarint32(buffer, offset)
-          offset += length.length
+          const length = readUnsignedVarint32(buffer, offset);
+          offset += length.length;
 
-          const jsonBuffer = buffer.slice(offset, offset + length.value)
-          offset += length.value
+          const jsonBuffer = buffer.slice(offset, offset + length.value);
+          offset += length.value;
 
-          const json = JSON.parse(jsonBuffer)
-          const fileContentsBuffer = buffer.slice(offset, offset + json.s)
-          offset += json.s
+          const json = JSON.parse(jsonBuffer);
+          const fileContentsBuffer = buffer.slice(offset, offset + json.s);
+          offset += json.s;
 
-          packages[json.n] = fileContentsBuffer.toString()
-        } catch(err) {
-          reject(err)
-          return
+          packages[json.n] = fileContentsBuffer.toString();
+        } catch (err) {
+          reject(err);
+          return;
         }
       }
-      resolve(packages)
-    })
-  })
+      resolve(packages);
+    });
+  });
 }
-
 
 function bundle(fileName, contents) {
   const header = JSON.stringify({
     n: fileName,
-    s: contents.length,
+    s: contents.length
   });
 
   let lenBuf = Buffer.alloc(10);
@@ -54,14 +53,13 @@ function bundle(fileName, contents) {
   const payload = Buffer.concat([
     lenBuf,
     Buffer.from(header),
-    Buffer.from(contents),
+    Buffer.from(contents)
   ]);
 
   return zlib.gzipSync(payload);
 }
 
-
 module.exports = {
   bundle,
-  unbundle,
-}
+  unbundle
+};

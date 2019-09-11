@@ -1,1 +1,1 @@
-require('mocha/bin/mocha');
+require("mocha/bin/mocha");

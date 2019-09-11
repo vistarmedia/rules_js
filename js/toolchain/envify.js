@@ -1,1 +1,1 @@
-require('loose-envify');
+require("loose-envify");
