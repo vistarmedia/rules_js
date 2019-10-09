@@ -28,6 +28,7 @@ async function checkFile(fileName, src) {
     "Date",
     "Error",
     "FileReader",
+    "FormData",
     "JSON",
     "Math",
     "Number",
