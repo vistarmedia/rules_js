@@ -166,11 +166,12 @@ def js_repositories():
 
     npm_tarball_install(
         name = "browserify",
-        url = "https://s3.amazonaws.com/js.vistarmedia.com/browserify-14.4.0.tgz",
-        sha256 = "deafadbb88c976fb2bf41e911dfc0a70e635a4073f1c8c49549eb964e96f9d62",
+        url = "https://s3.amazonaws.com/js.vistarmedia.com/browserify-16.0.0.tgz",
+        sha256 = "eef85603a1befaa7c4315f537b7d4deb02275ff7a69c1929756d6d7784c13b0e",
         ignore_deps = [
             "JSONStream",
             "assert",
+            "qq",
             "browser-pack",
             "browser-resolve",
             "browserify-zlib",

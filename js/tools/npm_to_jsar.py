@@ -95,7 +95,9 @@ def _copy_package(src, dst, root, package):
 def _copy_tar_files(src, dst, ignore_paths, rename):
   deps = {}
   for root, package in _package_roots(src, ignore_paths):
-    package['name'] = rename.get(package['name'], package['name'])
+    # package json's don't always include a "name" attribute
+    package_name = package.get('name', root)
+    package['name'] = rename.get(package_name, package_name)
     deps.update(_copy_package(src, dst, root, package))
   return deps
 

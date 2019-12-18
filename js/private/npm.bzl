@@ -68,7 +68,13 @@ def _create_workspace(ctx, tarballs):
         cmd += ["--ignore_deps"] + ignore_deps
 
     if visibility:
-        visibility_strings = ["@" + str(target) for target in visibility]
+        visibility_strings = []
+        for target in visibility:
+            target_label = str(target)
+            if target_label[0] == "@":
+                visibility_strings.append(target_label)
+            else:
+                visibility_strings.append("@" + target_label)
         cmd += ["--visibility"] + visibility_strings
 
     if ctx.attr.ignore_paths:
