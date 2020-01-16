@@ -90,6 +90,12 @@ def _create_workspace(ctx, tarballs):
             result.stderr,
         ))
 
+def _parse_package_name(package):
+    """
+    Splits npm package name into [@scope, name]
+    """
+    return package.split("/") if package.startswith("@") else [None, package]
+
 def _npm_install_impl(ctx):
     """
     Installs a package from the npm registry with an optional type declaration in
@@ -98,11 +104,13 @@ def _npm_install_impl(ctx):
     if not ctx.attr.version and not ctx.attr.type_version:
         fail("npm_install rule must declare either a version or type_version")
 
+    namespace, package = _parse_package_name(ctx.attr.package)
     tarballs = []
 
     if ctx.attr.version:
         url = _npm_registry_url(
-            package = ctx.attr.package,
+            namespace = namespace,
+            package = package,
             version = ctx.attr.version,
         )
 
