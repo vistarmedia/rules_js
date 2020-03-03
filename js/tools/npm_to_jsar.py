@@ -21,8 +21,8 @@ parser.add_argument('--ignore_deps', nargs='*')
 parser.add_argument('--ignore_paths', nargs='*', default=[])
 parser.add_argument('--visibility', nargs='*', default=None)
 
-
-_BUILDFILE = string.Template("""
+_BUILDFILE = string.Template(
+  """
 load('@com_vistarmedia_rules_js//js/private:rules.bzl', 'jsar')
 ${dep_infos}
 jsar(
@@ -32,6 +32,7 @@ jsar(
   visibility = ${visibility},
 )
 """)
+
 
 def _contains_ignored_path(path, ignore_paths):
   for ignored_path in ignore_paths:
@@ -63,14 +64,14 @@ def _package_roots(src, ignore_paths):
       continue
 
     if os.path.basename(name) == 'package.json':
-      root    = os.path.dirname(name)
+      root = os.path.dirname(name)
       package = json.load(src.extractfile(member))
       yield root, package
 
 
 def _copy_package(src, dst, root, package):
   dst_dir = package['name']
-  deps    = {}
+  deps = {}
 
   for dep, version in package.get('dependencies', {}).items():
     # Ignore dependencies in the @types/ namepace
@@ -82,7 +83,7 @@ def _copy_package(src, dst, root, package):
     if not member.isfile(): continue
     if not member.path.startswith(root): continue
 
-    package_path = member.path.replace(root+'/', '', 1)
+    package_path = member.path.replace(root + '/', '', 1)
     dst_path = os.path.join(dst_dir, package_path)
 
     info = tarfile.TarInfo(dst_path)
@@ -114,8 +115,9 @@ def _external_name(name):
              .replace('/', '.')\
              .replace('@', '')
 
-def _write_buildfile(filename, deps, js_tar_name, ignore_deps,
-                     visibility=None):
+
+def _write_buildfile(
+  filename, deps, js_tar_name, ignore_deps, visibility=None):
   if visibility is None:
     visibility = ['//visibility:public']
 
@@ -123,7 +125,7 @@ def _write_buildfile(filename, deps, js_tar_name, ignore_deps,
   if ignore_deps: to_ignore = set(ignore_deps)
 
   bazel_deps = []
-  dep_infos  = []
+  dep_infos = []
   for dep in sorted(deps.keys()):
     if dep in to_ignore: continue
 
@@ -137,19 +139,26 @@ def _write_buildfile(filename, deps, js_tar_name, ignore_deps,
     dep_infos.append('# %s %s' % (dep, version))
 
   with open(filename, 'w') as out:
-    out.write(_BUILDFILE.substitute({
-      'js_tar':     os.path.basename(js_tar_name),
-      'deps':       json.dumps(bazel_deps, indent=4),
-      'dep_infos':  '\n'.join(dep_infos),
-      'visibility': json.dumps(visibility),
-    }))
+    out.write(
+      _BUILDFILE.substitute({
+        'js_tar': os.path.basename(js_tar_name),
+        'deps': json.dumps(bazel_deps, indent=4),
+        'dep_infos': '\n'.join(dep_infos),
+        'visibility': json.dumps(visibility),
+      }))
 
 
 def _main(
-  buildfile, js_tar_name, npm_tar_names, ignore_deps, ignore_paths, rename, visibility):
+  buildfile,
+  js_tar_name,
+  npm_tar_names,
+  ignore_deps,
+  ignore_paths,
+  rename,
+  visibility):
 
   js_tar = tarfile.open(js_tar_name, 'w:gz')
-  deps   = {}
+  deps = {}
 
   for npm_tar_name in npm_tar_names:
     with tarfile.open(npm_tar_name) as npm_tar:
@@ -181,16 +190,16 @@ def main(args):
     rename = {parts[0]: parts[1]}
 
   _main(
-    buildfile     = params.buildfile,
-    js_tar_name   = params.output,
-    npm_tar_names = params.npm_tar,
-    ignore_deps   = params.ignore_deps,
-    ignore_paths  = params.ignore_paths,
-    rename        = rename,
-    visibility    = params.visibility
-  )
+    buildfile=params.buildfile,
+    js_tar_name=params.output,
+    npm_tar_names=params.npm_tar,
+    ignore_deps=params.ignore_deps,
+    ignore_paths=params.ignore_paths,
+    rename=rename,
+    visibility=params.visibility)
 
   return 0
+
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
