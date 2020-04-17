@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -44,49 +43,6 @@ func bundle(cmd string, args []string) error {
 		}
 	}
 	return writer.Close()
-}
-
-func unbundleTo(jsarpath, dstpath string) error {
-	file, err := os.Open(jsarpath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	r, err := jsar.NewReader(file)
-	if err != nil {
-		return err
-	}
-
-	for {
-		info, err := r.Next()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return err
-		}
-
-		dst := path.Join(dstpath, info.Name)
-		dir := path.Dir(dst)
-
-		stat, err := os.Stat(dir)
-		if err != nil || !stat.IsDir() {
-			if err := os.MkdirAll(dir, 0755); err != nil {
-				return err
-			}
-		}
-
-		w, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY, 0660)
-		if err != nil {
-			return err
-		}
-		if _, err := io.Copy(w, r); err != nil {
-			w.Close()
-			return err
-		}
-		w.Close()
-	}
-
-	return r.Close()
 }
 
 func list(jsarPath string) error {
@@ -128,9 +84,9 @@ func unbundle(cmd string, args []string) error {
 		return errors.New("unbundle -output root <jsar>")
 	}
 
-	for _, jsar := range flagSet.Args() {
-		if err := unbundleTo(jsar, *output); err != nil {
-			return errors.Wrapf(err, "Error extracting %s to %s", jsar, *output)
+	for _, jsarPath := range flagSet.Args() {
+		if err := jsar.UnbundleTo(jsarPath, *output); err != nil {
+			return errors.Wrapf(err, "Error extracting %s to %s", jsarPath, *output)
 		}
 	}
 

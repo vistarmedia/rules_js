@@ -1,0 +1,1 @@
+- fork esbuild and add support to work with jsars directly

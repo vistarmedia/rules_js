@@ -11,6 +11,16 @@ go_binary(
     ],
 )
 
+go_binary(
+    name = "esbuild",
+    srcs = ["esbuild.go"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_esbuild//src/esbuild/main:go_default_library",
+        "@com_vistarmedia_rules_js//js/tools/jsar:go_default_library",
+    ],
+)
+
 js_binary(
     name = "mocha",
     testonly = True,

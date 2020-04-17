@@ -36,6 +36,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -167,4 +168,47 @@ func (r *Reader) Read(b []byte) (int, error) {
 
 func (r *Reader) Close() error {
 	return r.gzReader.Close()
+}
+
+func UnbundleTo(jsarpath, dstpath string) error {
+	file, err := os.Open(jsarpath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	r, err := NewReader(file)
+	if err != nil {
+		return err
+	}
+
+	for {
+		info, err := r.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+
+		dst := path.Join(dstpath, info.Name)
+		dir := path.Dir(dst)
+
+		stat, err := os.Stat(dir)
+		if err != nil || !stat.IsDir() {
+			if err := os.MkdirAll(dir, 0755); err != nil {
+				return err
+			}
+		}
+
+		w, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY, 0660)
+		if err != nil {
+			return err
+		}
+		if _, err := io.Copy(w, r); err != nil {
+			w.Close()
+			return err
+		}
+		w.Close()
+	}
+
+	return r.Close()
 }
