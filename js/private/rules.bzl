@@ -1,3 +1,5 @@
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
 js_lib_providers = ["jsar", "runtime_deps", "compile_deps", "direct_cdeps"]
 js_bin_providers = ["jsar", "runtime_deps"]
 
@@ -340,3 +342,26 @@ js_binary = rule(
         "jsar": "%{name}.jsar",
     },
 )
+
+def js_empty_package(name, **kwargs):
+    """Makes an empty node package with the given name"""
+
+    index_file = name + "/index.js"
+    native.genrule(
+        name = name + "-index.js",
+        outs = [index_file],
+        cmd = "touch $@",
+    )
+
+    pkg_tar(
+        name = name + "-tar",
+        srcs = [index_file],
+        extension = "tar.gz",
+        package_dir = name,
+    )
+
+    jsar(
+        name = name,
+        tar = name + "-tar.tar.gz",
+        **kwargs
+    )
