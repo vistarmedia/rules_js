@@ -16,7 +16,7 @@ def esbuild_impl(ctx):
     arguments.add("--bundle")
     arguments.add("--outfile=%s" % out.path)
     for k, v in ctx.attr.define.items():
-        arguments.add('--define:%s="%s"' % (k, v))
+        arguments.add("--define:%s=%s" % (k, v))
 
     if ctx.attr.minify:
         arguments.add("--minify")
