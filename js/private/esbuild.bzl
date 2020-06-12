@@ -10,18 +10,19 @@ def esbuild_impl(ctx):
     out = ctx.actions.declare_file("%s.js" % ctx.label.name)
     outputs = [out]
 
+    esbuild_args = struct(
+        entrypoint = str(ctx.attr.src.main.short_path),
+        outfile = str(out.path),
+        defines = ctx.attr.define,
+        minify = bool(ctx.attr.minify),
+        sourcemap = bool(ctx.attr.sourcemap),
+    )
+
     arguments = ctx.actions.args()
     arguments.add_all(jsars, format_each = "--jsar=%s")
-    arguments.add("--entrypoint=%s" % ctx.attr.src.main.short_path)
-    arguments.add("--bundle")
-    arguments.add("--outfile=%s" % out.path)
-    for k, v in ctx.attr.define.items():
-        arguments.add("--define:%s=%s" % (k, v))
+    arguments.add(esbuild_args.to_json())
 
-    if ctx.attr.minify:
-        arguments.add("--minify")
     if ctx.attr.sourcemap:
-        arguments.add("--sourcemap")
         out = ctx.actions.declare_file("%s.js.map" % ctx.label.name)
         outputs.append(out)
 

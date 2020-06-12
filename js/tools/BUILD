@@ -16,7 +16,7 @@ go_binary(
     srcs = ["esbuild.go"],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_esbuild//src/esbuild/main:go_default_library",
+        "@com_github_esbuild//pkg/api:go_default_library",
         "@com_vistarmedia_rules_js//js/tools/jsar:go_default_library",
     ],
 )
