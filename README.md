@@ -5,32 +5,32 @@ run with Node, library targets produce concise binary build artifacts.
 ## Rules
 There are two public module rules
 
-    ```python
-    load('@com_vistarmedia_rules_js//js:def.bzl',
-      'js_binary',
-      'js_library')
+```bzl
+load('@com_vistarmedia_rules_js//js:def.bzl',
+  'js_binary',
+  'js_library')
 
-    js_library(
-      name = 'lib',
-      srcs = ['lib.js']
-    )
+js_library(
+  name = 'lib',
+  srcs = ['lib.js']
+)
 
-    js_binary(
-      name = 'bin',
-      srcs = ['main.js'],
-      deps = [':lib'],
-    )
-    ```
+js_binary(
+  name = 'bin',
+  srcs = ['main.js'],
+  deps = [':lib'],
+)
+```
 
 There is a WORKSPACE rule to install modules from NPM, optionally include their
 typescript definitions. `npm_install` will also take a `sha256` argument to
 verify against what's published on NPM as well as a `type_sha256` for the type
 declaration.
 
-    ```python
-    load('@com_vistarmedia_rules_js//js:def.bzl', 'npm_install')
-    npm_install('immutable', version='3.8.1', type_version='3.8.1')
-    ```
+```bzl
+load('@com_vistarmedia_rules_js//js:def.bzl', 'npm_install')
+npm_install('immutable', version='3.8.1', type_version='3.8.1')
+```
 
 The resulting library will be available as `@immutable//:lib`.
 
@@ -86,16 +86,16 @@ still needed to execute.
 
 The metadata is as follows:
 
-    ```python
-    struct(
-      files = <runtime jsar + compile-time jsar>
-      jsar  = <this library's runtime code>
-      cjsar = <this library's compile-time definitions>
+```bzl
+struct(
+  files = <runtime jsar + compile-time jsar>
+  jsar  = <this library's runtime code>
+  cjsar = <this library's compile-time definitions>
 
-      runtime_deps = <transitive set of runtime dependencies>
-      compile_deps = <transitive set of compile-time dependencies>
-    )
-    ```
+  runtime_deps = <transitive set of runtime dependencies>
+  compile_deps = <transitive set of compile-time dependencies>
+)
+```
 
 A `js_binary` target will create a "fat" archive -- its local code, and the code
 of all its transitive dependencies. It will also create a runner script which
