@@ -164,7 +164,9 @@ def node_driver(ctx, output, jsar, node, random_libdir, cmd, arguments = []):
     safe_args = ["'%s'" % arg for arg in arguments]
 
     # See the documentation for `create_libdir` in the rule attribute declaration
-    create_libdir = "LIBDIR=$(mktemp -d --suffix=.node_driver)"
+    # mktemp does not have a --suffix arg on macOS, so fallback to using -t for
+    # a prefix if the linux variant fails.
+    create_libdir = "LIBDIR=$(mktemp -d --suffix='.node-driver' 2>/dev/null || mktemp -d -t 'node_driver')"
     if not random_libdir:
         create_libdir = "LIBDIR=./node_modules && mkdir ./node_modules"
 
@@ -184,7 +186,7 @@ def node_driver(ctx, output, jsar, node, random_libdir, cmd, arguments = []):
         # test, however, it will set the environment variable, $TEST_SRCDIR to the
         # value.
         'runfiles_root="${self}.runfiles"',
-        "if [ -v TEST_SRCDIR ]; then",
+        "if [ ! -z ${TEST_SRCDIR+x} ]; then",
         '   runfiles_root="$TEST_SRCDIR"',
         "fi",
         'export RUNFILES="${runfiles_root}/%s"' % ctx.workspace_name,
