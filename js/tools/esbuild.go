@@ -40,7 +40,7 @@ func main() {
 
 	sourcemap := api.SourceMapNone
 	if esbuildOptions.Sourcemap {
-		sourcemap = api.SourceMapExternal
+		sourcemap = api.SourceMapLinked
 	}
 
 	result := api.Build(api.BuildOptions{
