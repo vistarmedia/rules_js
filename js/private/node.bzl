@@ -22,13 +22,6 @@ def js_repositories():
         build_file_content = _node_buildfile("darwin-x64"),
     )
 
-    # Meriyah parses JS to find dependencies
-    npm_install(
-        name = "meriyah",
-        version = "1.6.10",
-        sha256 = "f44b1eebc09c3d8e4c56f43e4993fd2e61d505c190a126209bb077687f3a824c",
-    )
-
     # Grab Mocha + dependencies
     npm_install(
         name = "graceful-readlink",
@@ -142,6 +135,11 @@ def js_repositories():
         sha256 = "aeeb60f75c0906fda54ca19b17fb1af591eecd92c053e3dc4e54e360312f3fc6",
     )
     npm_install(
+        name = "source-map-support",
+        version = "0.4.18",
+        sha256 = "82e7eb70bc5039b1e194e98f65eea2740bba35a4eda384eadba7d5867a60ade0",
+    )
+    npm_install(
         name = "mocha",
         version = "3.2.0",
         sha256 = "909a629739cbe09e73465b0615d0a7cc634041d8395787c8e8976e1a925c01c2",
@@ -150,94 +148,6 @@ def js_repositories():
         ignore_deps = [
             "browser.stdout",
             "growl",
-        ],
-    )
-
-    npm_install(
-        name = "source-map-support",
-        version = "0.4.18",
-        sha256 = "82e7eb70bc5039b1e194e98f65eea2740bba35a4eda384eadba7d5867a60ade0",
-    )
-    npm_install(
-        name = "source-map",
-        version = "0.5.6",
-        sha256 = "5b6d427a47255f75c923ceaa50b39567837a784f988fb5937b55bcfa6521e971",
-    )
-
-    npm_tarball_install(
-        name = "browserify",
-        url = "https://s3.amazonaws.com/js.vistarmedia.com/browserify-16.0.0.tgz",
-        sha256 = "eef85603a1befaa7c4315f537b7d4deb02275ff7a69c1929756d6d7784c13b0e",
-        ignore_deps = [
-            "JSONStream",
-            "assert",
-            "qq",
-            "browser-pack",
-            "browser-resolve",
-            "browserify-zlib",
-            "buffer",
-            "cached-path-relative",
-            "concat-stream",
-            "console-browserify",
-            "constants-browserify",
-            "crypto-browserify",
-            "defined",
-            "deps-sort",
-            "domain-browser",
-            "duplexer2",
-            "events",
-            "glob",
-            "has",
-            "htmlescape",
-            "https-browserify",
-            "inherits",
-            "insert-module-globals",
-            "labeled-stream-splicer",
-            "module-deps",
-            "os-browserify",
-            "parents",
-            "path-browserify",
-            "process",
-            "punycode",
-            "querystring-es3",
-            "read-only-stream",
-            "readable-stream",
-            "resolve",
-            "shasum",
-            "shell-quote",
-            "stream-browserify",
-            "stream-http",
-            "string_decoder",
-            "subarg",
-            "syntax-error",
-            "through2",
-            "timers-browserify",
-            "tty-browserify",
-            "url",
-            "util",
-            "vm-browserify",
-            "xtend",
-        ],
-    )
-
-    npm_install(
-        name = "js-tokens",
-        version = "3.0.2",
-        sha256 = "85ce7a76734264e093bcb1dbbe6d4d4130ee0a7fa562e7608693ee8c3c197d19",
-    )
-    npm_install(
-        name = "loose-envify",
-        version = "1.3.1",
-        sha256 = "fb526ac195ab33e34c3a5fc5a4f68ae865de3310209191c2f5ab56d9631ce088",
-    )
-
-    npm_tarball_install(
-        name = "uglifyjs",
-        url = "https://s3.amazonaws.com/js.vistarmedia.com/uglify-js-3.0.24.tgz",
-        sha256 = "afc191cfb99b252d750fdae86bcd0e1e74a764a470d0298ffb6655322ae9a50f",
-        ignore_deps = [
-            "commander",
-            "source-map",
         ],
     )
 

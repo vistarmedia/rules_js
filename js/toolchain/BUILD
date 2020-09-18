@@ -18,19 +18,3 @@ filegroup(
     }),
     visibility = ["//visibility:public"],
 )
-
-js_binary(
-    name = "uglify",
-    src = "uglify.js",
-    visibility = ["//visibility:public"],
-    deps = ["@uglifyjs//:lib"],
-)
-
-js_binary(
-    name = "loose-envify",
-    src = "envify.js",
-    visibility = ["//visibility:public"],
-    deps = ["@loose.envify//:lib"],
-)
-
-exports_files(["browserify.js"])

@@ -1,4 +1,3 @@
-load("//js/private:browserify.bzl", _js_bundle = "js_bundle")
 load("//js/private:mocha.bzl", _js_test = "js_test")
 load(
     "//js/private:node.bzl",
@@ -22,7 +21,6 @@ load(
     _jsar = "jsar",
 )
 
-js_bundle = _js_bundle
 js_test = _js_test
 
 js_repositories = _js_repositories
