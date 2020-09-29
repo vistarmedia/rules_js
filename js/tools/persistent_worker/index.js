@@ -7,10 +7,10 @@ const { readUnsignedVarint32 } = require("../varint");
 const readFile = util.promisify(fs.readFile);
 
 const def = require("./worker_protocol");
-const builder = protobuf.newBuilder({});
-const type = builder.import(def).build().blaze.worker;
 
-const { WorkRequest, WorkResponse } = type;
+const builder = protobuf.Root.fromJSON(def);
+const WorkRequest = builder.lookupType("WorkRequest").ctor;
+const WorkResponse = builder.lookupType("WorkResponse").ctor;
 
 // @private
 function readWorkRequests(src, onWork, resolve, reject) {
@@ -57,9 +57,9 @@ function readWorkRequests(src, onWork, resolve, reject) {
 function writeWorkResponse(out, response) {
   const { exitCode, output } = response;
   out.write(
-    new WorkResponse({ exit_code: exitCode, output: output })
-      .encodeDelimited()
-      .toBuffer()
+    WorkResponse.encodeDelimited(
+      new WorkResponse({ exit_code: exitCode, output: output })
+    ).finish()
   );
 }
 

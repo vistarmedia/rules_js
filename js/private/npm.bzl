@@ -40,6 +40,7 @@ def _create_workspace(ctx, tarballs):
     """
     ignore_deps = list(ctx.attr.ignore_deps)
     ignore_deps.append(ctx.attr.package)
+    include_dev_deps = ctx.attr.include_dev_deps
 
     visibility = list(ctx.attr.visibility)
 
@@ -66,6 +67,9 @@ def _create_workspace(ctx, tarballs):
     cmd += ["--npm_tar"] + npm_tars
     if ignore_deps:
         cmd += ["--ignore_deps"] + ignore_deps
+
+    if include_dev_deps:
+        cmd += ["--include_dev_deps=True"]
 
     if visibility:
         visibility_strings = []
@@ -169,6 +173,7 @@ attrs = {
     "type_version": attr.string(),
     "type_sha256": attr.string(),
     "ignore_deps": attr.string_list(),
+    "include_dev_deps": attr.bool(default = False),
     "ignore_paths": attr.string_list(),
     "rename": attr.bool(default = False),
     "_npm_to_jsar": attr.label(

@@ -115,8 +115,8 @@ def js_repositories():
     )
     npm_install(
         name = "glob",
-        version = "7.1.1",
-        sha256 = "17232040681c8bfa5badd0801a977fa79c05f0388974e8921fffabd380d10c0b",
+        version = "7.1.6",
+        sha256 = "54b05170b446eced68494509bb23892d0b17fd2a2bf1596609bdf322c415a6c2",
     )
     npm_install(
         name = "json3",

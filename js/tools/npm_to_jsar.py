@@ -17,6 +17,7 @@ parser.add_argument('--buildfile')
 parser.add_argument('--output')
 parser.add_argument('--rename')
 parser.add_argument('--npm_tar', nargs='+')
+parser.add_argument('--include_dev_deps', default=False)
 parser.add_argument('--ignore_deps', nargs='*')
 parser.add_argument('--ignore_paths', nargs='*', default=[])
 parser.add_argument('--visibility', nargs='*', default=None)
@@ -41,7 +42,7 @@ def _contains_ignored_path(path, ignore_paths):
   return False
 
 
-def _package_roots(src, ignore_paths):
+def _package_roots(src, ignore_paths, npm_tar_name):
   """
   Extract the package roots from an npm tarball. A spec for exactly how this
   works would be clearly too much to ask, so we're saying any directory that
@@ -55,7 +56,6 @@ def _package_roots(src, ignore_paths):
   for member in src.getmembers():
     if not member.isfile(): continue
     name = member.name
-
     # Do not look in nested node_modules directories for dependencies
     if '/node_modules/' in name:
       continue
@@ -69,9 +69,16 @@ def _package_roots(src, ignore_paths):
       yield root, package
 
 
-def _copy_package(src, dst, root, package):
+def _copy_package(src, dst, root, package, include_dev_deps):
   dst_dir = package['name']
   deps = {}
+
+  if include_dev_deps:
+    for dep, version in package.get('devDependencies', {}).items():
+      # Ignore dependencies in the @types/ namepace
+      if dep.startswith('@types/'): continue
+
+      deps[dep] = version
 
   for dep, version in package.get('dependencies', {}).items():
     # Ignore dependencies in the @types/ namepace
@@ -93,13 +100,14 @@ def _copy_package(src, dst, root, package):
   return deps
 
 
-def _copy_tar_files(src, dst, ignore_paths, rename):
+def _copy_tar_files(
+  src, dst, ignore_paths, include_dev_deps, rename, npm_tar_name):
   deps = {}
-  for root, package in _package_roots(src, ignore_paths):
+  for root, package in _package_roots(src, ignore_paths, npm_tar_name):
     # package json's don't always include a "name" attribute
     package_name = package.get('name', root)
     package['name'] = rename.get(package_name, package_name)
-    deps.update(_copy_package(src, dst, root, package))
+    deps.update(_copy_package(src, dst, root, package, include_dev_deps))
   return deps
 
 
@@ -154,6 +162,7 @@ def _main(
   npm_tar_names,
   ignore_deps,
   ignore_paths,
+  include_dev_deps,
   rename,
   visibility):
 
@@ -162,7 +171,14 @@ def _main(
 
   for npm_tar_name in npm_tar_names:
     with tarfile.open(npm_tar_name) as npm_tar:
-      deps.update(_copy_tar_files(npm_tar, js_tar, ignore_paths, rename))
+      deps.update(
+        _copy_tar_files(
+          npm_tar,
+          js_tar,
+          ignore_paths,
+          include_dev_deps,
+          rename,
+          npm_tar_name))
 
   _write_buildfile(buildfile, deps, js_tar_name, ignore_deps, visibility)
 
@@ -195,6 +211,7 @@ def main(args):
     npm_tar_names=params.npm_tar,
     ignore_deps=params.ignore_deps,
     ignore_paths=params.ignore_paths,
+    include_dev_deps=params.include_dev_deps,
     rename=rename,
     visibility=params.visibility)
 
