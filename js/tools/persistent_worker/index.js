@@ -1,16 +1,24 @@
-const protobuf = require("protobufjs");
 const fs = require("fs");
 const util = require("util");
+const jspb = require("google-protobuf");
 
 const { readUnsignedVarint32 } = require("../varint");
 
 const readFile = util.promisify(fs.readFile);
 
-const def = require("./worker_protocol");
+const { WorkRequest, WorkResponse } = require("./work");
 
-const builder = protobuf.Root.fromJSON(def);
-const WorkRequest = builder.lookupType("WorkRequest").ctor;
-const WorkResponse = builder.lookupType("WorkResponse").ctor;
+function serializeDelimited(messages) {
+  const writer = new jspb.BinaryWriter();
+
+  for (let message of messages) {
+    const m = message.serializeBinary();
+    writer.encoder_.writeUnsignedVarint32(m.buffer.byteLength);
+    writer.encoder_.writeBytes(m);
+  }
+
+  return Buffer.from(writer.getResultBuffer());
+}
 
 // @private
 function readWorkRequests(src, onWork, resolve, reject) {
@@ -39,7 +47,8 @@ function readWorkRequests(src, onWork, resolve, reject) {
       return;
     }
 
-    const request = WorkRequest.decode(data);
+    const request = WorkRequest.deserializeBinary(data);
+
     try {
       await onWork(request);
     } catch (err) {
@@ -56,11 +65,11 @@ function readWorkRequests(src, onWork, resolve, reject) {
 // @private
 function writeWorkResponse(out, response) {
   const { exitCode, output } = response;
-  out.write(
-    WorkResponse.encodeDelimited(
-      new WorkResponse({ exit_code: exitCode, output: output })
-    ).finish()
-  );
+  const wr = new WorkResponse();
+  wr.setExitCode(exitCode);
+  wr.setOutput(output);
+
+  out.write(serializeDelimited([wr]));
 }
 
 // @private
@@ -111,9 +120,20 @@ async function workUnsafe(
   // Running persistent
   if (arg === "--persistent_worker") {
     const onWork = async request => {
-      const arg = request.arguments[0];
+      const arg = request.getArgumentsList()[0];
       const workInput = await readWorkInput(flagPrefix, arg);
-      writeWorkResponse(output, await safeFun(workInput, request.inputs));
+      writeWorkResponse(
+        output,
+        await safeFun(
+          workInput,
+          request.getInputsList().map(i => {
+            return {
+              path: i.getPath(),
+              digest: i.getDigest()
+            };
+          })
+        )
+      );
     };
     return new Promise(resolve => {
       readWorkRequests(input, onWork, resolve);
