@@ -10,6 +10,6 @@ js_library(
     visibility = ["//visibility:public"],
     deps = [
         "//js/tools:varint",
-        "@protobufjs//:lib",
+        "@google.protobuf//:lib",
     ],
 )
