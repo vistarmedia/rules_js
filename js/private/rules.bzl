@@ -166,7 +166,7 @@ def node_driver(ctx, output, jsar, node, random_libdir, cmd, arguments = []):
     # See the documentation for `create_libdir` in the rule attribute declaration
     # mktemp does not have a --suffix arg on macOS, so fallback to using -t for
     # a prefix if the linux variant fails.
-    create_libdir = "LIBDIR=$(mktemp -d --suffix='.node-driver' 2>/dev/null || mktemp -d -t 'node_driver')"
+    create_libdir = "LIBDIR=$(mktemp -d --suffix='.node-driver' 2>/dev/null || mktemp -d -t 'node_driver.XXXXXX')"
     if not random_libdir:
         create_libdir = "LIBDIR=./node_modules && mkdir ./node_modules"
 
