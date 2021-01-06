@@ -18,7 +18,7 @@ def js_repositories():
     http_archive(
         name = "nodejs_darwin_amd64",
         urls = ["http://nodejs.org/dist/v12.19.0/node-v12.19.0-darwin-x64.tar.gz"],
-        sha256 = "aa1de83b388581d0d9ec3276f4526ee67e17e0f1bc0deb5133f960ce5dc9f1ef",
+        sha256 = "751482c5060c2b705bd63739300a8d06bb33bcfacaf616eec78bbc20c55a627b",
         build_file_content = _node_buildfile("darwin-x64"),
     )
 
