@@ -49,6 +49,9 @@ func main() {
 		Bundle:      true,
 		Defines:     esbuildOptions.Defines,
 
+		LogLevel: api.LogLevelInfo,
+		Color:    api.ColorIfTerminal,
+
 		MinifyWhitespace:  esbuildOptions.Minify,
 		MinifyIdentifiers: esbuildOptions.Minify,
 		MinifySyntax:      esbuildOptions.Minify,
@@ -56,12 +59,6 @@ func main() {
 		Sourcemap: sourcemap,
 	})
 
-	for _, e := range result.Errors {
-		fmt.Printf("%s at %s\n", e.Text, e.Location.File)
-	}
-	for _, e := range result.Warnings {
-		fmt.Printf("%s at %s\n", e.Text, e.Location.File)
-	}
 	if len(result.Errors) > 0 {
 		os.Exit(1)
 	}

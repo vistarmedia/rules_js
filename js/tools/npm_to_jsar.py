@@ -71,18 +71,29 @@ def _package_roots(src, ignore_paths, npm_tar_name):
 
 def _copy_package(src, dst, root, package, include_dev_deps):
   dst_dir = package['name']
+  # React v17.0.2 requires @types/scheduler and @types/prop-types as dependencies
+  type_package = dst_dir.startswith('@types/')
+  src_package = not type_package
   deps = {}
 
   if include_dev_deps:
     for dep, version in package.get('devDependencies', {}).items():
       # Ignore dependencies in the @types/ namepace
-      if dep.startswith('@types/'): continue
+      if dep.startswith('@types/'):
+        if src_package: continue
+        if type_package:
+          deps[dep[len("@types/"):]] = version
+          continue
 
       deps[dep] = version
 
   for dep, version in package.get('dependencies', {}).items():
     # Ignore dependencies in the @types/ namepace
-    if dep.startswith('@types/'): continue
+    if dep.startswith('@types/'):
+      if src_package: continue
+      if type_package:
+        deps[dep[len("@types/"):]] = version
+        continue
 
     deps[dep] = version
 

@@ -50,6 +50,7 @@ esbuild = rule(
                 "@events//:lib",
                 "@http//:lib",
                 "@path//:lib",
+                "@process//:lib",
                 "@stream//:lib",
                 "@url//:lib",
             ],
