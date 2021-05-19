@@ -76,6 +76,10 @@ async function main(paths) {
     : await readSources(paths.srcs);
 
   for (fileName in srcByFileName) {
+    if (!fileName.endsWith(".js")) {
+      continue;
+    }
+
     // We could try doing this in parallel, but we sacrifice the reproducibility
     // of the failures and the errors not being the same on each run
     const { errors, warnings } = await checkFile(

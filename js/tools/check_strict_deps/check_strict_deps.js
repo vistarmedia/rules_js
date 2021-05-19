@@ -61,6 +61,9 @@ async function getImports(jsar) {
   let imports = [];
 
   for (let file in jsar) {
+    if (!file.endsWith(".js")) {
+      continue;
+    }
     const fileImports = await getFileImports(jsar[file]);
     imports.push({ file, imports: fileImports });
   }
