@@ -201,11 +201,13 @@ def node_driver(ctx, output, jsar, node, random_libdir, cmd, arguments = []):
             jsar.short_path,
         ),
         "export NODE_PATH=$LIBDIR",
+        "set +e",
         '{node} $LIBDIR/{cmd} {arguments} "$@"'.format(
             node = node.path,
             cmd = cmd,
             arguments = " ".join(safe_args),
         ),
+        "exit $?",
     ]
 
     ctx.actions.write(
