@@ -21,9 +21,9 @@ describe("unbundle", () => {
   context("when I unbundle a valid buffer", () => {
     let files;
 
-    beforeEach(done => {
+    beforeEach((done) => {
       unbundle(validBuffer)
-        .then(f => {
+        .then((f) => {
           files = f;
         })
         .then(done)
@@ -35,7 +35,7 @@ describe("unbundle", () => {
         "/vistar/collection/index.d.ts":
           "export declare type List<T> = ReadonlyArray<T>;\nexport declare type MutableList<T> = Array<T>;\n",
         "/vistar/collection/index.js":
-          '"use strict";\nexports.__esModule = true;\n'
+          '"use strict";\nexports.__esModule = true;\n',
       });
     });
   });
@@ -53,7 +53,7 @@ describe("jsarWriter", () => {
     const jsar = await unbundle(await readFile(fname));
     expect(jsar).to.deep.equal({
       "/etc/passwd": "Nice programmings",
-      "/etc/shadow": "Hat town"
+      "/etc/shadow": "Hat town",
     });
   });
 });

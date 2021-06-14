@@ -1,6 +1,6 @@
-const colorCyan = str => `\x1b[36m${str}\x1b[0m`;
-const colorRed = str => `\x1b[31m${str}\x1b[0m`;
-const colorYellow = str => `\x1b[43m${str}\x1b[0m`;
+const colorCyan = (str) => `\x1b[36m${str}\x1b[0m`;
+const colorRed = (str) => `\x1b[31m${str}\x1b[0m`;
+const colorYellow = (str) => `\x1b[43m${str}\x1b[0m`;
 
 class Logger {
   constructor(name, src) {
@@ -61,5 +61,5 @@ module.exports = {
   Logger,
   colorCyan,
   colorRed,
-  colorYellow
+  colorYellow,
 };

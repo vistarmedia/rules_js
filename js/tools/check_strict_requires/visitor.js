@@ -14,7 +14,7 @@ function isArray(thing) {
 function visit(ast, scope) {
   switch (ast.type) {
     case "Program":
-      scope.child(child => {
+      scope.child((child) => {
         visitAll(ast.body, child);
       });
       break;
@@ -36,9 +36,9 @@ function visit(ast, scope) {
       break;
 
     case "FunctionExpression":
-      scope.child(child => {
+      scope.child((child) => {
         child.declareGlobals(["arguments"]);
-        ast.params.forEach(param => {
+        ast.params.forEach((param) => {
           child.declare(param.name, param.loc);
         });
         if (isArray(ast.body)) {
@@ -50,7 +50,7 @@ function visit(ast, scope) {
       break;
 
     case "BlockStatement":
-      scope.child(child => {
+      scope.child((child) => {
         visitAll(ast.body, child);
       });
       break;
@@ -125,9 +125,9 @@ function visit(ast, scope) {
 
     case "FunctionDeclaration":
       scope.declare(ast.id.name, ast.loc);
-      scope.child(child => {
+      scope.child((child) => {
         child.declareGlobals(["arguments"]);
-        ast.params.forEach(param => child.declare(param.name, param.loc));
+        ast.params.forEach((param) => child.declare(param.name, param.loc));
         visit(ast.body, child);
       });
       break;
@@ -195,9 +195,9 @@ function visit(ast, scope) {
 }
 
 function visitAll(asts, scope) {
-  asts.forEach(ast => visit(ast, scope));
+  asts.forEach((ast) => visit(ast, scope));
 }
 
 module.exports = {
-  visit
+  visit,
 };

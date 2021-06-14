@@ -39,7 +39,7 @@ class Scope {
   }
 
   check() {
-    Object.keys(this.identifiers).forEach(name => {
+    Object.keys(this.identifiers).forEach((name) => {
       const identifier = this.identifiers[name];
       if (!identifier.isUsed()) {
         if (identifier.isImported()) {
@@ -57,7 +57,7 @@ class Scope {
   }
 
   declareGlobals(names) {
-    names.forEach(name => {
+    names.forEach((name) => {
       this.declare(name, {});
       this.read(name);
     });
@@ -89,5 +89,5 @@ class Scope {
 }
 
 module.exports = {
-  Scope
+  Scope,
 };

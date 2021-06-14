@@ -25,7 +25,7 @@ function readWorkRequests(src, onWork, resolve, reject) {
   let data = null;
   let dataOffset = 0;
 
-  src.on("data", async chunk => {
+  src.on("data", async (chunk) => {
     if (data === null) {
       // This is the first chunk of the WorkRequest.
       const size = readUnsignedVarint32(chunk, 0);
@@ -119,23 +119,23 @@ async function workUnsafe(
 
   // Running persistent
   if (arg === "--persistent_worker") {
-    const onWork = async request => {
+    const onWork = async (request) => {
       const arg = request.getArgumentsList()[0];
       const workInput = await readWorkInput(flagPrefix, arg);
       writeWorkResponse(
         output,
         await safeFun(
           workInput,
-          request.getInputsList().map(i => {
+          request.getInputsList().map((i) => {
             return {
               path: i.getPath(),
-              digest: i.getDigest()
+              digest: i.getDigest(),
             };
           })
         )
       );
     };
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       readWorkRequests(input, onWork, resolve);
     });
   }

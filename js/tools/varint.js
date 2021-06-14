@@ -27,5 +27,5 @@ function writeUnsignedVarint32(buf, value) {
 
 module.exports = {
   readUnsignedVarint32,
-  writeUnsignedVarint32
+  writeUnsignedVarint32,
 };

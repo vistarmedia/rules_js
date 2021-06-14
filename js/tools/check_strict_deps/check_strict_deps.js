@@ -3,7 +3,7 @@ const { promisify } = require("util");
 
 const { unbundle } = require("com_vistarmedia_rules_js/js/tools/jsar/jsar");
 const {
-  checkStrictRequires
+  checkStrictRequires,
 } = require("com_vistarmedia_rules_js/js/tools/check_strict_requires/check_strict_requires");
 
 const readFile = promisify(fs.readFile);
@@ -28,12 +28,12 @@ const moduleProxy = new Proxy(_inner, {
   },
   apply(target, thisArg, argList) {
     return moduleProxy;
-  }
+  },
 });
 
 async function getFileImports(src) {
   let imports = [];
-  const captureImport = impt => {
+  const captureImport = (impt) => {
     if (imports.indexOf(impt) < 0) {
       imports.push(impt);
     }
@@ -45,7 +45,7 @@ async function getFileImports(src) {
     "beforeEach",
     "describe",
     "module",
-    "window"
+    "window",
   ];
   const proxies = new Array(proxiedKeywords.length).fill(moduleProxy);
 
@@ -71,7 +71,7 @@ async function getImports(jsar) {
   return imports;
 }
 
-const colorRed = str => `\x1b[31m${str}\x1b[0m`;
+const colorRed = (str) => `\x1b[31m${str}\x1b[0m`;
 
 function resolve(file, literalImpt, deps) {
   // Don't look at relative imports
@@ -89,7 +89,7 @@ function resolve(file, literalImpt, deps) {
     `${impt}/index.js`,
     `${impt}/index.d.ts`,
     `${impt}/index.json`,
-    `${impt}/package.json`
+    `${impt}/package.json`,
   ];
 
   for (let jsar in deps) {
@@ -126,7 +126,7 @@ async function main(paths) {
     const dep = await unbundle(await readFile(depName));
     deps[depName] = {
       files: Object.keys(dep),
-      imported_by: []
+      imported_by: [],
     };
   }
 
@@ -159,7 +159,7 @@ async function main(paths) {
   await writeFile(paths.output, JSON.stringify(deps, null, 2));
 }
 
-main(JSON.parse(process.argv[2])).catch(err => {
+main(JSON.parse(process.argv[2])).catch((err) => {
   console.error(err.stack);
   process.exit(1);
 });

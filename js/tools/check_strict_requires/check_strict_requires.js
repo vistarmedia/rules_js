@@ -56,7 +56,7 @@ async function checkFile(fileName, src) {
     "beforeEach",
     "context",
     "describe",
-    "it"
+    "it",
   ]);
   visit(ast, scope);
   scope.check();
@@ -64,7 +64,7 @@ async function checkFile(fileName, src) {
 }
 
 async function readSources(srcPaths) {
-  const srcs = await Promise.all(srcPaths.map(srcPath => readFile(srcPath)));
+  const srcs = await Promise.all(srcPaths.map((srcPath) => readFile(srcPath)));
   return srcs.reduce((acc, src, idx) => {
     return Object.assign({}, acc, { [srcPaths[idx]]: src.toString() });
   }, {});
@@ -98,5 +98,5 @@ async function main(paths) {
 }
 
 module.exports = {
-  checkStrictRequires: main
+  checkStrictRequires: main,
 };

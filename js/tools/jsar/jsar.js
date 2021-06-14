@@ -9,7 +9,7 @@ const { writeUnsignedVarint32 } = require("../varint");
  * @returns {Object} A mapping of file name to file contents
  */
 function unbundle(buffer) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     zlib.unzip(buffer, (error, buffer) => {
       if (error) {
         reject(error);
@@ -43,7 +43,7 @@ function unbundle(buffer) {
 function bundle(fileName, contents) {
   const header = JSON.stringify({
     n: fileName,
-    s: contents.length
+    s: contents.length,
   });
 
   let lenBuf = Buffer.alloc(10);
@@ -53,7 +53,7 @@ function bundle(fileName, contents) {
   const payload = Buffer.concat([
     lenBuf,
     Buffer.from(header),
-    Buffer.from(contents)
+    Buffer.from(contents),
   ]);
 
   return zlib.gzipSync(payload);
@@ -61,5 +61,5 @@ function bundle(fileName, contents) {
 
 module.exports = {
   bundle,
-  unbundle
+  unbundle,
 };

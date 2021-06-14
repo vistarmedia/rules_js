@@ -25,7 +25,7 @@ describe("unused identifier finder", () => {
       "it",
       "beforeEach",
       "context",
-      "describe"
+      "describe",
     ]);
   });
 
