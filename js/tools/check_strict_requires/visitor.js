@@ -183,6 +183,8 @@ function visit(ast, scope) {
       visit(ast.body, scope);
       break;
 
+    case "ContinueStatement":
+    case "TryStatement":
     case "BreakStatement":
     case "Literal":
     case "ThisExpression":
