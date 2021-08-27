@@ -14,7 +14,7 @@ import (
 type EsbuildOptions struct {
 	Entrypoint string
 	Outfile    string
-	Defines    map[string]string
+	Define     map[string]string
 	Minify     bool
 	Sourcemap  bool
 }
@@ -47,7 +47,7 @@ func main() {
 		EntryPoints: []string{fmt.Sprintf("./node_modules/%s", esbuildOptions.Entrypoint)},
 		Outfile:     esbuildOptions.Outfile,
 		Bundle:      true,
-		Defines:     esbuildOptions.Defines,
+		Define:      esbuildOptions.Define,
 
 		LogLevel: api.LogLevelInfo,
 		Color:    api.ColorIfTerminal,

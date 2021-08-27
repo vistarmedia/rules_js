@@ -13,7 +13,7 @@ def esbuild_impl(ctx):
     esbuild_args = struct(
         entrypoint = str(ctx.attr.src.main.short_path),
         outfile = str(out.path),
-        defines = ctx.attr.define,
+        define = ctx.attr.define,
         minify = bool(ctx.attr.minify),
         sourcemap = bool(ctx.attr.sourcemap),
     )
