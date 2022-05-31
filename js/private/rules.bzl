@@ -174,23 +174,15 @@ def node_driver(ctx, output, jsar, node, random_libdir, cmd, arguments = []):
         "#!/bin/bash -eu",
         "set -o pipefail",
 
-        # Get full path of the script and set it to `$self`. If it isn't absolute,
-        # prefix `$PWD` to ensure it is.
-        'case "$0" in',
-        '/*) self="$0" ;;',
-        '*)  self="${PWD}/${0}" ;;',
-        "esac",
-
-        # When executing as a binary target, Bazel will place our runfiles in the
-        # same name as this script with a '.runfiles' appended. When running as a
-        # test, however, it will set the environment variable, $TEST_SRCDIR to the
-        # value.
-        'runfiles_root="${self}.runfiles"',
-        "if [ ! -z ${TEST_SRCDIR+x} ]; then",
-        '   runfiles_root="$TEST_SRCDIR"',
+        # If pwd is already the path to the runfiles directory, prefer that.
+        "self=$(pwd)",
+        'if [[ "$self" = *runfiles/%s' % ctx.workspace_name + " ]]",
+        "then",
+        "  runfiles_root=$self",
+        "else",
+        '  runfiles_root="${0}.runfiles/%s"' % ctx.workspace_name,
         "fi",
-        'export RUNFILES="${runfiles_root}/%s"' % ctx.workspace_name,
-
+        "export RUNFILES=$runfiles_root",
         # Creates a home to store all 3rd-party JS code needed for this binary
         # target to run. Unless `random_libdir` is set to `False`, this will be a
         # random directory in the tmp filesystem
