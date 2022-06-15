@@ -2,6 +2,7 @@ load("@com_vistarmedia_rules_js//js/private:rules.bzl", "js_binary")
 
 def _mocha_test_impl(ctx):
     cmd = [ctx.executable.driver.short_path] + \
+          ["--color"] + \
           ["--require=source-map-support/register"] + \
           ["--require=%s" % r.short_path for r in ctx.files.requires]
 
