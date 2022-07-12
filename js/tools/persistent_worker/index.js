@@ -135,8 +135,8 @@ async function workUnsafe(
         )
       );
     };
-    return new Promise((resolve) => {
-      readWorkRequests(input, onWork, resolve);
+    return new Promise((resolve, reject) => {
+      readWorkRequests(input, onWork, resolve, reject);
     });
   }
 
