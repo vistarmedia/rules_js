@@ -6,3 +6,5 @@ js_empty_package(
     name = "fs",
     visibility = ["//visibility:public"],
 )
+
+exports_files(["jsdom.js"])

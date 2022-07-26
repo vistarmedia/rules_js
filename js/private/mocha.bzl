@@ -4,7 +4,9 @@ def _mocha_test_impl(ctx):
     cmd = [ctx.executable.driver.short_path] + \
           ["--color"] + \
           ["--require=source-map-support/register"] + \
-          ["--require=%s" % r.short_path for r in ctx.files.requires]
+          ["--require=%s" % ctx.file.jsdom.path] + \
+          ["--require=%s" % r.short_path for r in ctx.files.requires] + \
+          ["--timeout=10000"]
 
     if ctx.attr.reporter:
         cmd += ["--reporter=" + ctx.attr.reporter.label.package]
@@ -22,7 +24,7 @@ def _mocha_test_impl(ctx):
     )
 
     runfiles = ctx.runfiles(
-        files = ctx.files.tests + ctx.files.data + ctx.files.requires,
+        files = ctx.files.tests + ctx.files.data + ctx.files.requires + ctx.files.jsdom,
     ).merge(ctx.attr.driver.default_runfiles)
 
     return [DefaultInfo(
@@ -34,6 +36,7 @@ _mocha_test = rule(
     _mocha_test_impl,
     test = True,
     attrs = {
+        "jsdom": attr.label(allow_single_file = True),
         "tests": attr.label_list(allow_files = True),
         "requires": attr.label_list(allow_files = True),
         "data": attr.label_list(),
@@ -44,6 +47,8 @@ _mocha_test = rule(
 
 def mocha_test(name, deps, srcs, reporter = None, **kwargs):
     all_deps = deps + [
+        "@global.jsdom//:lib",
+        "@jsdom//:lib",
         "@mocha//:lib",
         "@source.map.support//:lib",
     ]
@@ -62,6 +67,7 @@ def mocha_test(name, deps, srcs, reporter = None, **kwargs):
         driver = name + ".driver",
         tests = srcs,
         reporter = reporter,
+        jsdom = "@com_vistarmedia_rules_js//js/private:jsdom.js",
         **kwargs
     )
 
