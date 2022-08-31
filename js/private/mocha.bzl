@@ -4,9 +4,11 @@ def _mocha_test_impl(ctx):
     cmd = [ctx.executable.driver.short_path] + \
           ["--color"] + \
           ["--require=source-map-support/register"] + \
-          ["--require=%s" % ctx.file.jsdom.path] + \
           ["--require=%s" % r.short_path for r in ctx.files.requires] + \
           ["--timeout=10000"]
+
+    if ctx.attr.has_dom:
+        cmd += ["--require=%s" % ctx.file.jsdom.path]
 
     if ctx.attr.reporter:
         cmd += ["--reporter=" + ctx.attr.reporter.label.package]
@@ -36,6 +38,7 @@ _mocha_test = rule(
     _mocha_test_impl,
     test = True,
     attrs = {
+        "has_dom": attr.bool(doc = "Enable global DOM"),
         "jsdom": attr.label(allow_single_file = True),
         "tests": attr.label_list(allow_files = True),
         "requires": attr.label_list(allow_files = True),
