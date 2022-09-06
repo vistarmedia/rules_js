@@ -51,8 +51,8 @@ def js_repositories():
     )
     npm_tarball_install(
         name = "mocha",
-        url = "https://s3.amazonaws.com/cookbooks.vistarmedia.com/third-party/mocha-full-7.1.0-types.tgz",
-        sha256 = "c2a312ae4e89eaa116449aa7f3df5ddaab1270657f473bf1cf2d2abc6fbcb879",
+        url = "https://s3.amazonaws.com/cookbooks.vistarmedia.com/third-party/mocha-10.0.0.tgz",
+        sha256 = "681afbde18e90ee06705273fa8f9b9b7994097dbce62132490eb3029f838baaf",
         ignore_deps = [
             "glob",
             "debug",
@@ -73,6 +73,10 @@ def js_repositories():
             "he",
             "chokidar",
             "supports-color",
+            "serialize-javascript",
+            "nanoid",
+            "ungap.promise.all.settled",
+            "workerpool",
         ],
     )
 

@@ -6,8 +6,14 @@ const cookieJar = new jsdom.CookieJar(undefined, {
   rejectPublicSuffixes: false,
 });
 
-globalJsdom("", {
+const cleanup = globalJsdom("", {
   pretendToBeVisual: true,
   url: "http://localhost.local:3000",
   cookieJar,
 });
+
+module.exports.mochaHooks = {
+  afterAll() {
+    cleanup();
+  },
+};
