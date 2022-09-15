@@ -60,10 +60,13 @@ _mocha_test = rule(
 def mocha_test(name, deps, srcs, reporter = None, **kwargs):
     all_deps = deps + [
         "@global.jsdom//:lib",
-        "@jsdom//:lib",
         "@mocha//:lib",
         "@source.map.support//:lib",
     ]
+
+    if "@jsdom//:lib" not in all_deps:
+        all_deps += ["@jsdom//:lib"]
+
     if reporter:
         all_deps += [reporter]
 
