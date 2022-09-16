@@ -7,4 +7,7 @@ js_empty_package(
     visibility = ["//visibility:public"],
 )
 
-exports_files(["jsdom.js"])
+exports_files([
+    "consoleThrow.js",
+    "jsdom.js",
+])
