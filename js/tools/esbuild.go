@@ -47,7 +47,10 @@ func main() {
 		EntryPoints: []string{fmt.Sprintf("./node_modules/%s", esbuildOptions.Entrypoint)},
 		Outfile:     esbuildOptions.Outfile,
 		Bundle:      true,
-		Define:      esbuildOptions.Define,
+		Loader: map[string]api.Loader{
+			".svg": api.LoaderText,
+		},
+		Define: esbuildOptions.Define,
 
 		LogLevel: api.LogLevelInfo,
 		Color:    api.ColorIfTerminal,
