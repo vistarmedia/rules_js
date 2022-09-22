@@ -25,8 +25,8 @@ def js_repositories():
     # Grab Mocha + dependencies
     npm_install(
         name = "source-map-support",
-        version = "0.5.12",
-        sha256 = "e3c1870b1c31c84b60f370142e1f84ea04fb3473fad5531d8187faf367396cf4",
+        version = "0.5.21",
+        sha256 = "5d9b04ef3e6824fdcf91cfcc03ab427fae486bc6859735805593f51b3554f636",
     )
     npm_install(
         name = "buffer-from",

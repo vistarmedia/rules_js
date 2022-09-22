@@ -3,8 +3,10 @@ load("@com_vistarmedia_rules_js//js/private:rules.bzl", "js_binary")
 def _mocha_test_impl(ctx):
     cmd = [ctx.executable.driver.short_path] + \
           ["--color"] + \
-          ["--require=source-map-support/register"] + \
           ["--require=%s" % r.short_path for r in ctx.files.requires]
+
+    if ctx.attr.source_map_support:
+        cmd += ["--require=source-map-support/register"]
 
     if ctx.attr.has_dom:
         cmd += ["--require=%s" % ctx.file.jsdom.path]
@@ -22,6 +24,7 @@ def _mocha_test_impl(ctx):
 
     script = [
         "#!/bin/sh -e",
+        "export NODE_ENV=test",
         " ".join(cmd),
     ]
 
@@ -58,6 +61,7 @@ _mocha_test = rule(
         "throw_warn": attr.bool(default = True),
         "console": attr.label(allow_single_file = True),
         "debug": attr.bool(doc = "Enable Chrome debugger, see about:inspect"),
+        "source_map_support": attr.bool(),
     },
 )
 
