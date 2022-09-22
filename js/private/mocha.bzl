@@ -15,6 +15,9 @@ def _mocha_test_impl(ctx):
     if ctx.attr.reporter:
         cmd += ["--reporter=" + ctx.attr.reporter.label.package]
 
+    if ctx.attr.debug:
+        cmd.append("--inspect-brk")
+
     cmd += [test.short_path for test in ctx.files.tests]
 
     script = [
@@ -54,6 +57,7 @@ _mocha_test = rule(
         "driver": attr.label(executable = True, cfg = "host"),
         "throw_warn": attr.bool(default = True),
         "console": attr.label(allow_single_file = True),
+        "debug": attr.bool(doc = "Enable Chrome debugger, see about:inspect"),
     },
 )
 
