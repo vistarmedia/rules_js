@@ -75,6 +75,9 @@ def mocha_test(name, deps, srcs, reporter = None, **kwargs):
     if "@jsdom//:lib" not in all_deps:
         all_deps += ["@jsdom//:lib"]
 
+    if "@sinon//:lib" not in all_deps:
+        all_deps += ["@sinon//:lib"]
+
     if reporter:
         all_deps += [reporter]
 

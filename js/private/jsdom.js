@@ -1,5 +1,6 @@
 const jsdom = require("jsdom");
 const globalJsdom = require("global-jsdom");
+const sinon = require("sinon");
 
 const cookieJar = new jsdom.CookieJar(undefined, {
   allowSpecialUseDomain: true,
@@ -13,6 +14,24 @@ const cleanup = globalJsdom("", {
 });
 
 module.exports.mochaHooks = {
+  beforeEach() {
+    if (!global.Date.isFake) {
+      this.isFakeTimer = true;
+      this.clock = sinon.useFakeTimers({
+        shouldAdvanceTime: true,
+      });
+      const restore = this.clock.restore;
+      this.clock.restore = () => {
+        this.isFakeTimer = false;
+        restore();
+      };
+    }
+  },
+  afterEach() {
+    if (this.isFakeTimer) {
+      this.clock.restore();
+    }
+  },
   afterAll() {
     cleanup();
   },

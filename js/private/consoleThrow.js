@@ -2,16 +2,19 @@ let consoleWarn = console.warn;
 let consoleError = console.error;
 
 module.exports.mochaHooks = {
-  beforeAll() {
+  beforeEach() {
     console.warn = (msg, ...args) => {
-      throw new Error(msg, ...args);
+      console.log(msg, ...args);
+      this.failures++;
+      throw Error(msg, ...args);
     };
     console.error = (msg, ...args) => {
       console.log(msg, ...args);
-      throw new Error(msg, ...args);
+      this.failures++;
+      throw Error(msg, ...args);
     };
   },
-  afterAll() {
+  afterEach() {
     console.warn = consoleWarn;
     console.error = consoleError;
   },
