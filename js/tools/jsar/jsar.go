@@ -9,21 +9,21 @@
 // While something like protobuf may be better to represent the header, json is
 // used here to minimize dependencies. The layout of single entry is as follows:
 //
-//    +-----------------------+--------+----------+
-//    | uvarint header length | header | bytes... |
-//    +-----------------------+--------+----------+
+//	+-----------------------+--------+----------+
+//	| uvarint header length | header | bytes... |
+//	+-----------------------+--------+----------+
 //
 // Given a file containing `Party Every Day!` (a length of 16) at the location
 // `/some/cool/path`, the header would be `{"n":"/some/cool/path","s":16}` (a
 // length of 30). This would give the following `jsar` contents.
 //
-//    +----+---------------------+------------------+
-//    | 1e | {"n":"/some/cool... | Party Every D... |
-//    +----+---------------------+------------------+
-//    |    |                     |
-//    |    |                     +--- File contents
-//    |    +------------------------- JSON header
-//    +------------------------------ Varint header length
+//	+----+---------------------+------------------+
+//	| 1e | {"n":"/some/cool... | Party Every D... |
+//	+----+---------------------+------------------+
+//	|    |                     |
+//	|    |                     +--- File contents
+//	|    +------------------------- JSON header
+//	+------------------------------ Varint header length
 //
 // The format is simply a repeated number of file entries as specified above.
 package jsar
