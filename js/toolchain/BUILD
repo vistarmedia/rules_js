@@ -13,8 +13,8 @@ config_setting(
 filegroup(
     name = "node",
     srcs = select({
-        ":k8": ["@nodejs_linux_amd64//:node"],
-        ":darwin": ["@nodejs_darwin_amd64//:node"],
+        ":k8": ["@nodejs_linux_amd64_vistar//:node"],
+        ":darwin": ["@nodejs_darwin_amd64_vistar//:node"],
     }),
     visibility = ["//visibility:public"],
 )

@@ -9,14 +9,14 @@ def _node_buildfile(arch):
 
 def js_repositories():
     http_archive(
-        name = "nodejs_linux_amd64",
+        name = "nodejs_linux_amd64_vistar",
         urls = ["https://nodejs.org/dist/v14.15.4/node-v14.15.4-linux-x64.tar.gz"],
         sha256 = "b51c033d40246cd26e52978125a3687df5cd02ee532e8614feff0ba6c13a774f",
         build_file_content = _node_buildfile("linux-x64"),
     )
 
     http_archive(
-        name = "nodejs_darwin_amd64",
+        name = "nodejs_darwin_amd64_vistar",
         urls = ["https://nodejs.org/dist/v14.15.4/node-v14.15.4-darwin-x64.tar.gz"],
         sha256 = "6b0e19e5c2601ef97510f7eb4f52cc8ee261ba14cb05f31eb1a41a5043b0304e",
         build_file_content = _node_buildfile("darwin-x64"),
