@@ -32,7 +32,10 @@ module.exports.mochaHooks = {
       this.clock.restore();
     }
   },
-  afterAll() {
+  async afterAll() {
+    if (this.isFakeTimer) {
+      await this.clock.runAllAsync();
+    }
     cleanup();
   },
 };
