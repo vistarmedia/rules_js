@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Even those this script is run as a cfg='host', its not wrapped in a py_binary,
 # and it doesnt seem straightforward to use a py_binary in a repository_ctx. As
