@@ -69,6 +69,16 @@ def _package_roots(src, ignore_paths, npm_tar_name):
       yield root, package
 
 
+# The following (peer) dependencies are ignored for the following reasons:
+#   - `@babel/core` -- not needed
+#   - `canvas` -- huge dependency, and not used in our tests
+#   - `dayjs` -- used for MUI date pickers, but we don't use this date lib
+#   - `luxon` -- same as above
+#
+# NOTE:  If you add something to this list, please update the reasoning above
+IGNORED_DEPS = ["@babel/core", "canvas", "dayjs", "luxon"]
+
+
 def _copy_package(src, dst, root, package, include_dev_deps):
   dst_dir = package['name']
   # React v17.0.2 requires @types/scheduler and @types/prop-types as dependencies
@@ -76,18 +86,15 @@ def _copy_package(src, dst, root, package, include_dev_deps):
   src_package = not type_package
   deps = {}
 
+  dependencies = package.get('dependencies', {})
+  dependencies.update(package.get('peerDependencies', {}))
+
   if include_dev_deps:
-    for dep, version in package.get('devDependencies', {}).items():
-      # Ignore dependencies in the @types/ namepace
-      if dep.startswith('@types/'):
-        if src_package: continue
-        if type_package:
-          deps[dep[len("@types/"):]] = version
-          continue
+    dependencies.update(package.get('devDependencies', {}))
 
-      deps[dep] = version
-
-  for dep, version in package.get('dependencies', {}).items():
+  for dep, version in dependencies.items():
+    if dep in IGNORED_DEPS:
+      continue
     # Ignore dependencies in the @types/ namepace
     if dep.startswith('@types/'):
       if src_package: continue
