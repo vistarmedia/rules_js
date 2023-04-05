@@ -4,30 +4,25 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def _node_buildfile(arch):
     return "\n".join([
         'package(default_visibility=["//visibility:public"])',
-        'filegroup(name="node", srcs=["node-v14.15.4-%s/bin/node"])' % arch,
+        'filegroup(name="node", srcs=["node-v18.15.0-%s/bin/node"])' % arch,
     ])
 
 def js_repositories():
     http_archive(
         name = "nodejs_linux_amd64_vistar",
-        urls = ["https://nodejs.org/dist/v14.15.4/node-v14.15.4-linux-x64.tar.gz"],
-        sha256 = "b51c033d40246cd26e52978125a3687df5cd02ee532e8614feff0ba6c13a774f",
+        urls = ["https://nodejs.org/dist/v18.15.0/node-v18.15.0-linux-x64.tar.xz"],
+        sha256 = "c8c5fa53ce0c0f248e45983e86368e0b1daf84b77e88b310f769c3cfc12682ef",
         build_file_content = _node_buildfile("linux-x64"),
     )
 
     http_archive(
         name = "nodejs_darwin_amd64_vistar",
-        urls = ["https://nodejs.org/dist/v14.15.4/node-v14.15.4-darwin-x64.tar.gz"],
-        sha256 = "6b0e19e5c2601ef97510f7eb4f52cc8ee261ba14cb05f31eb1a41a5043b0304e",
+        urls = ["https://nodejs.org/dist/v18.15.0/node-v18.15.0-darwin-x64.tar.gz"],
+        sha256 = "76add174d2d3f98da08907412e82add7352b8cb6f639324d352a65c084b99c7e",
         build_file_content = _node_buildfile("darwin-x64"),
     )
 
     # Grab Mocha + dependencies
-    npm_install(
-        name = "source-map-support",
-        version = "0.5.21",
-        sha256 = "5d9b04ef3e6824fdcf91cfcc03ab427fae486bc6859735805593f51b3554f636",
-    )
     npm_install(
         name = "buffer-from",
         version = "1.0.0",

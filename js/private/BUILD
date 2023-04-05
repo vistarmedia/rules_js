@@ -10,4 +10,6 @@ js_empty_package(
 exports_files([
     "consoleThrow.js",
     "jsdom.js",
+    "reactFix.js",
+    "svg.js",
 ])
