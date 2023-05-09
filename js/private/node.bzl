@@ -22,6 +22,13 @@ def js_repositories():
         build_file_content = _node_buildfile("darwin-x64"),
     )
 
+    http_archive(
+        name = "nodejs_darwin_arm64_vistar",
+        urls = ["https://nodejs.org/dist/v18.15.0/node-v18.15.0-darwin-arm64.tar.gz"],
+        sha256 = "bd302a689c3c34e2b61d86b97de66d26a335881a17af09b6a0a4bb1019df56e4",
+        build_file_content = _node_buildfile("darwin-arm64"),
+    )
+
     # Grab Mocha + dependencies
     npm_install(
         name = "buffer-from",
